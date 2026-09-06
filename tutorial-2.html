@@ -44,7 +44,7 @@
   <div class="mh-nav-inner">
     <a class="mh-nav-logo" href="index.html">
       <img src="assets/matholic_logo.png" alt="MATHOLIC">
-      <span>AI 서술형채점</span>
+      <span>AI 서술형첨삭</span>
     </a>
     <nav class="mh-nav-links">
       <a class="mh-nav-link" href="index.html">홈</a>
@@ -216,7 +216,8 @@ const STEPS = [
     desc: "문제지 출력 화면에서 OMR답안지만 선택합니다.",
     holes: [
       { x: 1.4, y: 6.2, w: 5.4, h: 5.4 },
-      { x: 85.3, y: 51.0, w: 13.3, h: 3.4 }
+      // [답안 작성 용지] · [OMR 답안지] 두 줄만 감싸고 [문항 힌트]는 제외 (여백 4px)
+      { x: 85.3, y: 48.0, w: 13.3, h: 4.3, pad: 4 }
     ],
     card: { left: 60, top: 60 }
   },
@@ -246,6 +247,23 @@ const STEPS = [
     card: { left: 47, top: 20 }
   }
 ];
+
+// 강조 네모는 대상에 딱 붙지 않고 상하좌우로 여백을 두고 그려집니다.
+// 기본 15px이며, 각 holes 항목의 pad 값(px)으로 개별 조절할 수 있습니다.
+// (화면 폭 1144px · 이미지 2881x1532 기준 환산값 — 창 크기가 바뀌어도 비율이 유지됩니다.)
+const PAD_DEFAULT = 15;
+const UNIT_X = 1.31 / 15;
+const UNIT_Y = 2.47 / 15;
+const padHole = h => {
+  const p = h.pad == null ? PAD_DEFAULT : h.pad;
+  const dx = UNIT_X * p, dy = UNIT_Y * p;
+  return {
+    x: +(h.x - dx).toFixed(2),
+    y: +(h.y - dy).toFixed(2),
+    w: +(h.w + dx * 2).toFixed(2),
+    h: +(h.h + dy * 2).toFixed(2)
+  };
+};
 
 const PROGRESS_KEY = 'mh-ai-grading-tutorial-progress';
 function readProgress() {
@@ -323,7 +341,9 @@ class Component extends DCLogic {
       transition: "opacity 220ms ease-out"
     };
 
-    const rings = s.holes.map((h) => ({
+    const padded = s.holes.map(padHole);
+
+    const rings = padded.map((h) => ({
       style: {
         position: "absolute",
         left: h.x + "%", top: h.y + "%", width: h.w + "%", height: h.h + "%",
@@ -441,7 +461,7 @@ class Component extends DCLogic {
     return {
       op0: op(0), op1: op(1), op2: op(2), op3: op(3),
       overlayStyle,
-      holes: s.holes,
+      holes: padded,
       rings,
       cardStyle,
       dimFill: "rgba(17,24,39," + dim + ")",
