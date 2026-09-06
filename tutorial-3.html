@@ -15,10 +15,28 @@
 <script src="_ds/matholic-design-system-e6d31222-91d3-47b9-aebe-84a65a8b8cf0/_ds_bundle.js"></script>
 <style>
   * { box-sizing: border-box; }
-  body { margin: 0; background: #EFF1F4; }
+  body { margin: 0; background: #E9E8FA; -webkit-font-smoothing: antialiased; }
   a { color: #4A3EE0; text-decoration: none; }
   a:hover { color: #372FA0; text-decoration: underline; }
   @keyframes mhFade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes mhDeviceZoom {
+    0%   { transform: scale(1); }
+    14%  { transform: scale(1.32); }
+    72%  { transform: scale(1.32); }
+    100% { transform: scale(1); }
+  }
+  @keyframes mhConfettiFall {
+    0%   { opacity: 0; transform: translate3d(0,-10px,0) rotate(0deg) scale(.6); }
+    12%  { opacity: 1; }
+    100% { opacity: 0; transform: translate3d(var(--dx,0px), 320px, 0) rotate(var(--rot,540deg)) scale(1); }
+  }
+  @keyframes mhPopIn {
+    0%   { opacity: 0; transform: scale(.88) translateY(8px); }
+    60%  { transform: scale(1.02) translateY(0); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .mh-confetti { position:absolute; left:0; right:0; top:10%; height:0; pointer-events:none; z-index:2; }
+  .mh-confetti i { position:absolute; top:0; display:block; width:9px; height:14px; border-radius:2px; animation:mhConfettiFall 2.6s ease-in forwards; }
   .mh-nav{position:sticky; top:0; z-index:40; background:#FFFFFF; border-bottom:1px solid #EEEEEE;}
   .mh-nav-inner{max-width:1200px; margin:0 auto; padding:0 24px; height:60px; display:flex; align-items:center; gap:24px;}
   .mh-nav-logo{display:flex; align-items:center; gap:8px; text-decoration:none; flex:0 0 auto;}
@@ -44,48 +62,46 @@
     </nav>
   </div>
 </div>
-<div style="min-height:100vh; display:flex; flex-direction:column; gap:16px; padding:24px; background:#EFF1F4; font-family:var(--mh-font); letter-spacing:-0.005em">
+<div style="min-height:100vh; padding:28px 20px 40px; box-sizing:border-box; display:flex; justify-content:center; align-items:flex-start; font-family:var(--mh-font); letter-spacing:-0.005em">
+  <div style="width:100%; max-width:1200px; background:#FFFFFF; border-radius:16px; border:1px solid #DDDBF6; box-shadow:0 12px 40px rgba(30,24,90,0.14); overflow:hidden">
 
-  <div style="display:flex; align-items:flex-end; gap:24px; flex-wrap:wrap">
-    <div style="display:flex; flex-direction:column; gap:8px; flex:1; min-width:0">
-      <h1 style="font:700 24px/100% var(--mh-font); color:#212121">OMR 답안 입력하기</h1>
-      <p style="font:400 14px/22px var(--mh-font); color:#555; text-wrap:pretty">학생이 학습한 답안지를 매쓰홀릭 프리미엄에 업로드합니다.</p>
-    </div>
-    <div style="display:flex; flex-direction:column; gap:8px; width:240px">
-      <div style="display:flex; justify-content:space-between; align-items:baseline; font:600 13px/1 var(--mh-font); color:#212121">
-        <span>{{ chapterName }}</span>
-        <span style="color:#999">{{ subLabel }}</span>
+    <div style="display:flex; align-items:flex-start; gap:20px; padding:24px 28px 18px; border-bottom:1px solid #EEEEEE; flex-wrap:wrap">
+      <div style="flex:1 1 320px; min-width:0; display:flex; flex-direction:column; gap:8px">
+        <div style="display:flex; align-items:center; gap:8px">
+          <span style="display:inline-flex; align-items:center; height:22px; padding:0 8px; border-radius:6px; background:#6155F5; color:#FFFFFF; font-size:12px; font-weight:700; letter-spacing:-0.005em">NEW</span>
+          <span style="font-size:13px; font-weight:600; color:#6155F5; letter-spacing:-0.005em; white-space:nowrap">AI 서술형 첨삭</span>
+        </div>
+        <h1 style="margin:0; font-size:24px; font-weight:700; color:#212121; letter-spacing:-0.01em">Ⅲ. AI서술형첨삭 확인</h1>
+        <p style="margin:0; font-size:14px; line-height:22px; color:#555555; text-wrap:pretty">학생이 제출한 답안을 업로드하고, AI가 풀이과정을 단계별로 채점·첨삭하는 결과를 확인합니다.</p>
       </div>
-      <div style="height:4px; border-radius:999px; background:#D9D9D9; overflow:hidden">
-        <div style="height:100%; background:#6155F5; border-radius:999px; transition:width .2s ease-out; width:{{ pct }}"></div>
+      <div style="display:flex; align-items:center; gap:12px; flex:0 0 auto">
+        <div style="display:flex; gap:0; padding:3px; background:#F4F3FE; border:1px solid #E3E1F7; border-radius:8px">
+          <button type="button" onClick="{{ setTutorial }}" style="{{ manualTabStyle }}">튜토리얼</button>
+          <button type="button" onClick="{{ setAuto }}" style="{{ autoTabStyle }}">자동재생</button>
+        </div>
+        <span style="font-size:13px; font-weight:600; color:#777777; white-space:nowrap">STEP <span style="color:#6155F5; font-weight:700">{{ stepNo }}</span> / {{ total }}</span>
       </div>
-      <div style="font:400 12px/16px var(--mh-font); color:#777">{{ stepName }}</div>
     </div>
-  </div>
 
-  <div style="display:flex; flex-direction:column; gap:12px; padding:14px 16px; background:#fff; border:1px solid #D9D9D9; border-radius:10px">
-    <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap">
-      <div style="display:flex; flex-wrap:wrap; gap:12px; flex:1; min-width:0">
-        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
-          <button type="button" onClick="{{ t.go }}" style="display:inline-flex; align-items:center; gap:8px; height:36px; padding:0 16px; border-radius:6px; cursor:pointer; white-space:nowrap; flex:none; font:{{ t.font }}; background:{{ t.bg }}; color:{{ t.fg }}; border:1px solid {{ t.border }}" style-hover="background:#F7F8F9">
-            <span style="display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:999px; font:600 11px/1 var(--mh-font); background:{{ t.numBg }}; color:{{ t.numFg }}">{{ t.no }}</span>
-            {{ t.name }}
-          </button>
+    <div style="height:4px; background:#F0EFFC">
+      <div style="height:100%; background:#6155F5; border-radius:0 4px 4px 0; transition:width .25s ease-out" style="{{ progressStyle }}"></div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:12px; padding:14px 28px; border-bottom:1px solid #EEEEEE">
+      <div style="display:flex; gap:8px; overflow-x:auto">
+        <sc-for list="{{ pills }}" as="p" hint-placeholder-count="4">
+          <button type="button" onClick="{{ p.onClick }}" style="{{ p.style }}">{{ p.label }}</button>
         </sc-for>
       </div>
-      <div style="display:flex; flex:none; border:1px solid #D9D9D9; border-radius:6px; overflow:hidden">
-        <button type="button" onClick="{{ setTutorial }}" style="height:34px; padding:0 14px; border:none; cursor:pointer; white-space:nowrap; font:{{ tutFont }}; background:{{ tutBg }}; color:{{ tutFg }}">튜토리얼</button>
-        <button type="button" onClick="{{ setAuto }}" style="height:34px; padding:0 14px; border:none; border-left:1px solid #D9D9D9; cursor:pointer; white-space:nowrap; font:{{ autoFont }}; background:{{ autoBg }}; color:{{ autoFg }}">자동재생</button>
+      <div style="display:flex; align-items:center; gap:6px">
+        <sc-for list="{{ dots }}" as="d" hint-placeholder-count="4">
+          <button type="button" onClick="{{ d.go }}" title="{{ d.name }}" style="border:none; cursor:pointer; padding:0; height:6px; border-radius:999px; transition:width .2s ease-out, background .15s ease-out; width:{{ d.w }}; background:{{ d.bg }}"></button>
+        </sc-for>
       </div>
     </div>
-    <div style="display:flex; align-items:center; gap:8px">
-      <sc-for list="{{ dots }}" as="d" hint-placeholder-count="4">
-        <button type="button" onClick="{{ d.go }}" title="{{ d.name }}" style="border:none; cursor:pointer; padding:0; height:6px; border-radius:999px; transition:width .2s ease-out, background .15s ease-out; width:{{ d.w }}; background:{{ d.bg }}"></button>
-      </sc-for>
-    </div>
-  </div>
 
   <sc-if value="{{ tipOutside }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:18px 28px 0">
     <div style="display:flex; flex-direction:column; gap:10px; padding:16px 20px; background:#fff; border:1px solid #4A3EE0; border-radius:10px; animation:mhFade .2s ease-out">
       <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap">
         <span style="display:inline-flex; align-items:center; height:22px; padding:0 8px; border-radius:4px; background:#4A3EE0; color:#fff; font:600 12px/1 var(--mh-font)">{{ tag }}</span>
@@ -120,9 +136,10 @@
         <span style="margin-left:auto; font:400 11px/14px var(--mh-font); color:#999">{{ counter }}</span>
       </div>
     </div>
+    </div>
   </sc-if>
 
-  <div style="background:#fff; border:1px solid #D9D9D9; border-radius:10px; padding:12px; min-width:0">
+  <div style="padding:22px 28px 8px; min-width:0">
 
     <sc-if value="{{ isSingle }}" hint-placeholder-val="{{ true }}">
       <div onClick="{{ next }}" title="화면을 선택하면 다음으로 이동합니다" style="position:relative; border:1px solid #EEEEEE; border-radius:6px; overflow:hidden; cursor:pointer; background:#fff; aspect-ratio:{{ ratio }}; transition:opacity .26s ease-out, transform .26s ease-out; opacity:{{ fadeOpacity }}; transform:{{ fadeShift }}">
@@ -212,20 +229,23 @@
         <div style="position:absolute; pointer-events:none; border:2px solid #6155F5; border-radius:8px; left:44%; top:20.3%; width:12%; height:6.4%; box-shadow:0 0 0 1px #4A3EE0, 0 0 0 4px rgba(97,85,245,0.30)"></div>
 
         <sc-if value="{{ videoLive }}" hint-placeholder-val="{{ true }}">
-          <div onClick="{{ stop }}" style="position:absolute; right:3%; bottom:5%; width:36%; padding:1.2%; border-radius:18px; background:#141414; box-shadow:0 10px 24px rgba(0,0,0,0.28); cursor:default">
-            <video src="{{ videoSrc }}" ref="{{ videoRef }}" onEnded="{{ onVideoEnd }}" onPlay="{{ onVideoPlay }}" onClick="{{ togglePlay }}" playsinline style="display:block; width:100%; aspect-ratio:1280 / 720; border-radius:8px; background:#fff; cursor:pointer"></video>
-            <sc-if value="{{ showPlay }}" hint-placeholder-val="{{ true }}">
-              <button type="button" onClick="{{ playVideo }}" style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; border:none; cursor:pointer; background:rgba(24,32,28,0.45); border-radius:18px">
-                <span style="display:flex; align-items:center; justify-content:center; width:48px; height:48px; border-radius:999px; background:#4A3EE0; color:#fff">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"></path></svg>
-                </span>
-              </button>
-            </sc-if>
+          <div onClick="{{ stop }}" style="position:absolute; right:3%; bottom:5%; width:36%; cursor:default; transform-origin:bottom right; animation:mhDeviceZoom 4s ease-in-out .35s 1 both">
+            <div style="margin-bottom:3%; padding:9px 12px; border-radius:10px; background:#4A3EE0; color:#fff; font:600 13px/19px var(--mh-font); text-align:center; box-shadow:0 6px 16px rgba(0,35,11,0.24); text-wrap:pretty">모바일 카메라로 [QR코드]만 스캔하면 손쉽게 파일 업로드 완료!</div>
+            <div style="position:relative; padding:1.2%; border-radius:18px; background:#141414; box-shadow:0 10px 24px rgba(0,0,0,0.28)">
+              <video src="{{ videoSrc }}" ref="{{ videoRef }}" onEnded="{{ onVideoEnd }}" onPlay="{{ onVideoPlay }}" onClick="{{ togglePlay }}" playsinline style="display:block; width:100%; aspect-ratio:1280 / 720; border-radius:8px; background:#fff; cursor:pointer"></video>
+              <sc-if value="{{ showPlay }}" hint-placeholder-val="{{ true }}">
+                <button type="button" onClick="{{ playVideo }}" style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; border:none; cursor:pointer; background:rgba(24,32,28,0.45); border-radius:18px">
+                  <span style="display:flex; align-items:center; justify-content:center; width:48px; height:48px; border-radius:999px; background:#4A3EE0; color:#fff">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"></path></svg>
+                  </span>
+                </button>
+              </sc-if>
+            </div>
           </div>
         </sc-if>
         <sc-if value="{{ videoEnded }}" hint-placeholder-val="{{ false }}">
           <div onClick="{{ stop }}" style="position:absolute; right:3%; bottom:4%; width:52%; background:#fff; border:1px solid #4A3EE0; border-radius:10px; box-shadow:0 6px 16px rgba(0,35,11,0.2); padding:12px 14px; cursor:default; display:flex; gap:14px; animation:mhFade .2s ease-out">
-            <div style="height:150px; aspect-ratio:891 / 691; flex:none; border:1px solid #EEEEEE; border-radius:6px; background-image:url('uploads/t3/여러학생.png'); background-size:100% 100%; background-repeat:no-repeat; background-color:#fff"></div>
+            <div style="height:195px; aspect-ratio:891 / 691; flex:none; border:1px solid #EEEEEE; border-radius:6px; background-image:url('uploads/t3/여러학생.png'); background-size:100% 100%; background-repeat:no-repeat; background-color:#fff"></div>
             <div style="display:flex; flex-direction:column; gap:8px; min-width:0; flex:1">
             <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap">
               <span style="display:inline-flex; align-items:center; height:22px; padding:0 8px; border-radius:4px; background:#4A3EE0; color:#fff; font:600 12px/1 var(--mh-font)">TIP</span>
@@ -262,11 +282,44 @@
       </div>
     </sc-if>
 
+    </div>
+
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; padding:16px 28px 24px; flex-wrap:wrap">
+      <div style="display:flex; flex-direction:column; gap:4px; min-width:0">
+        <span style="font-size:13px; font-weight:600; color:#6155F5">표시된 곳을 눌러 다음 단계로 이동합니다.</span>
+        <span style="font-size:12px; color:#999999">화면을 선택해도 다음 단계로 이동합니다.</span>
+      </div>
+      <div style="display:flex; gap:12px; flex:0 0 auto">
+        <button type="button" onClick="{{ restart }}" style="{{ ghostStyle }}">처음부터</button>
+        <button type="button" onClick="{{ prev }}" disabled="{{ atStart }}" style="{{ prevStyle }}">← 이전</button>
+        <button type="button" onClick="{{ next }}" style="{{ nextStyle }}">{{ nextLabel }}</button>
+      </div>
+    </div>
   </div>
 
   <sc-if value="{{ showComplete }}" hint-placeholder-val="{{ false }}">
     <div style="position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center; background:rgba(20,18,43,0.55); padding:20px; box-sizing:border-box">
-      <div style="width:100%; max-width:420px; background:#fff; border-radius:16px; box-shadow:0 20px 60px rgba(30,24,90,0.35); padding:32px 28px 24px; box-sizing:border-box; display:flex; flex-direction:column; gap:16px; text-align:center">
+      <div style="width:100%; max-width:420px; background:#fff; border-radius:16px; box-shadow:0 20px 60px rgba(30,24,90,0.35); padding:32px 28px 24px; box-sizing:border-box; display:flex; flex-direction:column; gap:16px; text-align:center; position:relative; overflow:hidden; animation:mhPopIn .32s cubic-bezier(.2,.9,.3,1.2) both">
+          <div class="mh-confetti" aria-hidden="true">
+            <i style="left:3.0%; width:11px; height:11px; background:#6155F5; --dx:12px; --rot:480deg; animation-delay:0.22s; animation-duration:2.14s"></i>
+            <i style="left:8.5%; width:7px; height:11px; background:#4A3EE0; --dx:23px; --rot:-420deg; animation-delay:0.03s; animation-duration:2.56s"></i>
+            <i style="left:14.1%; width:9px; height:11px; background:#A9A3FA; --dx:41px; --rot:720deg; animation-delay:0.04s; animation-duration:2.18s"></i>
+            <i style="left:19.6%; width:7px; height:16px; background:#FFC53D; --dx:-39px; --rot:480deg; animation-delay:0.35s; animation-duration:2.62s"></i>
+            <i style="left:25.1%; width:7px; height:14px; background:#36CFC9; --dx:31px; --rot:360deg; animation-delay:0.54s; animation-duration:2.14s"></i>
+            <i style="left:30.6%; width:11px; height:16px; background:#FF7875; --dx:37px; --rot:480deg; animation-delay:0.3s; animation-duration:2.61s"></i>
+            <i style="left:36.2%; width:9px; height:11px; background:#73D13D; --dx:-24px; --rot:360deg; animation-delay:0.32s; animation-duration:2.68s"></i>
+            <i style="left:41.7%; width:7px; height:14px; background:#FF85C0; --dx:70px; --rot:-600deg; animation-delay:0.03s; animation-duration:2.15s"></i>
+            <i style="left:47.2%; width:9px; height:14px; background:#6155F5; --dx:66px; --rot:720deg; animation-delay:0.43s; animation-duration:2.52s"></i>
+            <i style="left:52.8%; width:7px; height:11px; background:#4A3EE0; --dx:6px; --rot:480deg; animation-delay:0.44s; animation-duration:2.73s"></i>
+            <i style="left:58.3%; width:9px; height:14px; background:#A9A3FA; --dx:6px; --rot:-420deg; animation-delay:0.27s; animation-duration:2.41s"></i>
+            <i style="left:63.8%; width:9px; height:11px; background:#FFC53D; --dx:-52px; --rot:360deg; animation-delay:0.28s; animation-duration:2.25s"></i>
+            <i style="left:69.4%; width:11px; height:16px; background:#36CFC9; --dx:55px; --rot:720deg; animation-delay:0.02s; animation-duration:2.7s"></i>
+            <i style="left:74.9%; width:11px; height:14px; background:#FF7875; --dx:10px; --rot:540deg; animation-delay:0.38s; animation-duration:2.63s"></i>
+            <i style="left:80.4%; width:11px; height:11px; background:#73D13D; --dx:-53px; --rot:360deg; animation-delay:0.52s; animation-duration:2.53s"></i>
+            <i style="left:85.9%; width:11px; height:14px; background:#FF85C0; --dx:-55px; --rot:-600deg; animation-delay:0.39s; animation-duration:2.68s"></i>
+            <i style="left:91.5%; width:7px; height:14px; background:#6155F5; --dx:2px; --rot:-600deg; animation-delay:0.21s; animation-duration:2.7s"></i>
+            <i style="left:97.0%; width:7px; height:14px; background:#4A3EE0; --dx:20px; --rot:480deg; animation-delay:0.34s; animation-duration:2.54s"></i>
+          </div>
         <div style="width:56px; height:56px; margin:0 auto; border-radius:999px; background:#EFEEFE; display:flex; align-items:center; justify-content:center">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6155F5" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg>
         </div>
@@ -418,10 +471,8 @@ class Component extends DCLogic {
   };
 
   componentDidMount() {
-    try {
-      const v = parseInt(localStorage.getItem('omr-onboarding-step') || '', 10);
-      if (!isNaN(v) && v >= 0 && v < FLAT.length) this.setState({ i: v });
-    } catch (e) {}
+    // 다른 섹션을 다녀와도 항상 첫 화면부터 시작합니다.
+    try { localStorage.removeItem('omr-onboarding-step'); } catch (e) {}
     this.setState({ marked: !!readProgress().t3 });
     this._key = e => {
       if (e.key === 'ArrowRight') this.go(this.state.i + 1);
@@ -451,7 +502,6 @@ class Component extends DCLogic {
     clearTimeout(this._fadeT);
     this.setState({ i, videoEnded: false, playing: false, zoom: null, fade: true }, () => this.schedule());
     this._fadeT = setTimeout(() => this.setState({ fade: false }), 30);
-    try { localStorage.setItem('omr-onboarding-step', String(i)); } catch (e) {}
   }
 
   goChapter(ci) {
@@ -479,7 +529,45 @@ class Component extends DCLogic {
     const tip = s.tip || {};
     const marks = s.marks || [];
     const done = kind === 'tablet' && this.state.videoEnded;
+
+    const btn = (kindOf, disabled) => ({
+      height: '40px', padding: '0 20px', borderRadius: '6px', fontFamily: 'inherit',
+      fontSize: '14px', fontWeight: 600, letterSpacing: '-0.005em', whiteSpace: 'nowrap',
+      cursor: disabled ? 'default' : 'pointer', transition: 'all .15s ease-out',
+      border: kindOf === 'primary' ? '1px solid ' + ACCENT : '1px solid #D9D9D9',
+      background: disabled ? '#F7F8F9' : (kindOf === 'primary' ? ACCENT : '#FFFFFF'),
+      color: disabled ? '#999999' : (kindOf === 'primary' ? '#FFFFFF' : '#555555')
+    });
+
+    const tab = on => ({
+      height: '28px', padding: '0 14px', borderRadius: '6px', border: 'none',
+      fontFamily: 'inherit', fontSize: '13px', fontWeight: on ? 700 : 500, whiteSpace: 'nowrap',
+      background: on ? ACCENT : 'transparent', color: on ? '#FFFFFF' : '#777777',
+      cursor: 'pointer', transition: 'all .15s ease-out'
+    });
+
     return {
+      stepNo: i + 1,
+      total: FLAT.length,
+      progressStyle: { width: ((i + 1) / FLAT.length * 100).toFixed(1) + '%' },
+      manualTabStyle: tab(!auto),
+      autoTabStyle: tab(auto),
+      prevStyle: btn('sub', i === 0),
+      nextStyle: btn('primary', false),
+      ghostStyle: btn('sub', false),
+      restart: () => this.go(0),
+      pills: CHAPTERS.map((c, ci) => ({
+        label: (ci + 1) + '. ' + c.name,
+        onClick: () => this.goChapter(ci),
+        style: {
+          flex: '0 0 auto', height: '30px', padding: '0 12px', borderRadius: '999px', whiteSpace: 'nowrap',
+          fontFamily: 'inherit', fontSize: '13px', fontWeight: ci === s.ci ? 700 : 500,
+          cursor: 'pointer', transition: 'all .15s ease-out',
+          border: ci === s.ci ? '1px solid ' + ACCENT : '1px solid #E3E1F7',
+          background: ci === s.ci ? ACCENT_TINT : '#FFFFFF',
+          color: ci === s.ci ? ACCENT : (ci < s.ci ? '#555555' : '#999999')
+        }
+      })),
       chapterName: s.chapter,
       subLabel: (s.si + 1) + ' / ' + s.subTotal,
       counter: (i + 1) + ' / ' + FLAT.length,
@@ -580,7 +668,7 @@ class Component extends DCLogic {
       dots: CHAPTERS[s.ci].steps.map((st, n) => ({
         name: st.name,
         w: n === s.si ? '28px' : '10px',
-        bg: n === s.si ? ACCENT_LINE : '#D9D9D9',
+        bg: n === s.si ? ACCENT_LINE : (n < s.si ? '#C7C2FA' : '#D9D9D9'),
         go: () => this.go(i - s.si + n)
       }))
     };

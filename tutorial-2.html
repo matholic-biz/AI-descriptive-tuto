@@ -26,6 +26,18 @@
   .mh-nav-link{display:inline-flex; align-items:center; height:34px; padding:0 14px; border-radius:8px; font-size:13px; font-weight:600; color:#777777; text-decoration:none; white-space:nowrap; transition:all .15s ease-out;}
   .mh-nav-link:hover{background:#F7F8F9; color:#212121; text-decoration:none;}
   .mh-nav-link.active{background:#EFEEFE; color:#6155F5; font-weight:700;}
+  @keyframes mhConfettiFall {
+    0%   { opacity: 0; transform: translate3d(0,-10px,0) rotate(0deg) scale(.6); }
+    12%  { opacity: 1; }
+    100% { opacity: 0; transform: translate3d(var(--dx,0px), 320px, 0) rotate(var(--rot,540deg)) scale(1); }
+  }
+  @keyframes mhPopIn {
+    0%   { opacity: 0; transform: scale(.88) translateY(8px); }
+    60%  { transform: scale(1.02) translateY(0); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .mh-confetti { position:absolute; left:0; right:0; top:10%; height:0; pointer-events:none; z-index:2; }
+  .mh-confetti i { position:absolute; top:0; display:block; width:9px; height:14px; border-radius:2px; animation:mhConfettiFall 2.6s ease-in forwards; }
 </style>
 </helmet>
 <div class="mh-nav">
@@ -55,7 +67,11 @@
         <p style="margin: 0; font-size: 14px; line-height: 22px; color: #555555; text-wrap: pretty;">시험대비 실전감각을 키우기 위해 OMR답안지로 학습을 진행합니다.</p>
       </div>
       <div style="display: flex; align-items: center; gap: 12px; flex: 0 0 auto;">
-        <span style="font-size: 13px; font-weight: 600; color: #777777; white-space: nowrap;">{{ counter }}</span>
+        <div style="display: flex; gap: 0; padding: 3px; background: #F4F3FE; border: 1px solid #E3E1F7; border-radius: 8px;">
+          <button type="button" onClick="{{ setTutorial }}" style="{{ manualTabStyle }}">튜토리얼</button>
+          <button type="button" onClick="{{ setAuto }}" style="{{ autoTabStyle }}">자동재생</button>
+        </div>
+        <span style="font-size: 13px; font-weight: 600; color: #777777; white-space: nowrap;">STEP <span style="color: #6155F5; font-weight: 700;">{{ stepNo }}</span> / {{ total }}</span>
       </div>
     </div>
 
@@ -63,10 +79,17 @@
       <div style="height: 100%; background: #6155F5; border-radius: 0 4px 4px 0; transition: width .25s ease-out;" style="{{ progressStyle }}"></div>
     </div>
 
-    <div style="display: flex; gap: 8px; padding: 14px 28px; overflow-x: auto; border-bottom: 1px solid #EEEEEE;">
-      <sc-for list="{{ pills }}" as="p" hint-placeholder-count="5">
-        <button type="button" onClick="{{ p.onClick }}" style="{{ p.style }}">{{ p.label }}</button>
-      </sc-for>
+    <div style="display: flex; flex-direction: column; gap: 12px; padding: 14px 28px; border-bottom: 1px solid #EEEEEE;">
+      <div style="display: flex; gap: 8px; overflow-x: auto;">
+        <sc-for list="{{ pills }}" as="p" hint-placeholder-count="5">
+          <button type="button" onClick="{{ p.onClick }}" style="{{ p.style }}">{{ p.label }}</button>
+        </sc-for>
+      </div>
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <sc-for list="{{ dots }}" as="d" hint-placeholder-count="5">
+          <button type="button" onClick="{{ d.go }}" aria-label="{{ d.label }}" style="{{ d.style }}"></button>
+        </sc-for>
+      </div>
     </div>
 
     <div style="padding: 22px 28px 8px;">
@@ -131,7 +154,27 @@
 
   <sc-if value="{{ showComplete }}" hint-placeholder-val="{{ false }}">
     <div style="position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; background: rgba(20,18,43,0.55); padding: 20px; box-sizing: border-box;">
-      <div style="width: 100%; max-width: 420px; background: #fff; border-radius: 16px; box-shadow: 0 20px 60px rgba(30,24,90,0.35); padding: 32px 28px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px; text-align: center;">
+      <div style="width: 100%; max-width: 420px; background: #fff; border-radius: 16px; box-shadow: 0 20px 60px rgba(30,24,90,0.35); padding: 32px 28px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px; text-align: center; position:relative; overflow:hidden; animation:mhPopIn .32s cubic-bezier(.2,.9,.3,1.2) both">
+          <div class="mh-confetti" aria-hidden="true">
+            <i style="left:3.0%; width:11px; height:11px; background:#6155F5; --dx:12px; --rot:480deg; animation-delay:0.22s; animation-duration:2.14s"></i>
+            <i style="left:8.5%; width:7px; height:11px; background:#4A3EE0; --dx:23px; --rot:-420deg; animation-delay:0.03s; animation-duration:2.56s"></i>
+            <i style="left:14.1%; width:9px; height:11px; background:#A9A3FA; --dx:41px; --rot:720deg; animation-delay:0.04s; animation-duration:2.18s"></i>
+            <i style="left:19.6%; width:7px; height:16px; background:#FFC53D; --dx:-39px; --rot:480deg; animation-delay:0.35s; animation-duration:2.62s"></i>
+            <i style="left:25.1%; width:7px; height:14px; background:#36CFC9; --dx:31px; --rot:360deg; animation-delay:0.54s; animation-duration:2.14s"></i>
+            <i style="left:30.6%; width:11px; height:16px; background:#FF7875; --dx:37px; --rot:480deg; animation-delay:0.3s; animation-duration:2.61s"></i>
+            <i style="left:36.2%; width:9px; height:11px; background:#73D13D; --dx:-24px; --rot:360deg; animation-delay:0.32s; animation-duration:2.68s"></i>
+            <i style="left:41.7%; width:7px; height:14px; background:#FF85C0; --dx:70px; --rot:-600deg; animation-delay:0.03s; animation-duration:2.15s"></i>
+            <i style="left:47.2%; width:9px; height:14px; background:#6155F5; --dx:66px; --rot:720deg; animation-delay:0.43s; animation-duration:2.52s"></i>
+            <i style="left:52.8%; width:7px; height:11px; background:#4A3EE0; --dx:6px; --rot:480deg; animation-delay:0.44s; animation-duration:2.73s"></i>
+            <i style="left:58.3%; width:9px; height:14px; background:#A9A3FA; --dx:6px; --rot:-420deg; animation-delay:0.27s; animation-duration:2.41s"></i>
+            <i style="left:63.8%; width:9px; height:11px; background:#FFC53D; --dx:-52px; --rot:360deg; animation-delay:0.28s; animation-duration:2.25s"></i>
+            <i style="left:69.4%; width:11px; height:16px; background:#36CFC9; --dx:55px; --rot:720deg; animation-delay:0.02s; animation-duration:2.7s"></i>
+            <i style="left:74.9%; width:11px; height:14px; background:#FF7875; --dx:10px; --rot:540deg; animation-delay:0.38s; animation-duration:2.63s"></i>
+            <i style="left:80.4%; width:11px; height:11px; background:#73D13D; --dx:-53px; --rot:360deg; animation-delay:0.52s; animation-duration:2.53s"></i>
+            <i style="left:85.9%; width:11px; height:14px; background:#FF85C0; --dx:-55px; --rot:-600deg; animation-delay:0.39s; animation-duration:2.68s"></i>
+            <i style="left:91.5%; width:7px; height:14px; background:#6155F5; --dx:2px; --rot:-600deg; animation-delay:0.21s; animation-duration:2.7s"></i>
+            <i style="left:97.0%; width:7px; height:14px; background:#4A3EE0; --dx:20px; --rot:480deg; animation-delay:0.34s; animation-duration:2.54s"></i>
+          </div>
         <div style="width: 56px; height: 56px; margin: 0 auto; border-radius: 999px; background: #EFEEFE; display: flex; align-items: center; justify-content: center;">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6155F5" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg>
         </div>
@@ -217,7 +260,7 @@ function markSectionDone(id) {
 }
 
 class Component extends DCLogic {
-  state = { step: 0, visible: false, showComplete: false, marked: false };
+  state = { step: 0, visible: false, showComplete: false, marked: false, mode: "tutorial" };
 
   componentDidMount() {
     this.setState({ marked: !!readProgress().t2 });
@@ -230,9 +273,19 @@ class Component extends DCLogic {
     window.addEventListener("keydown", this._key);
   }
 
+  setMode(mode) { this.setState({ mode }, () => this.schedule()); }
+
+  schedule() {
+    clearTimeout(this._auto);
+    if (this.state.mode !== "auto") return;
+    if (this.state.step >= STEPS.length - 1) { this.setState({ mode: "tutorial" }); return; }
+    this._auto = setTimeout(() => this.go(this.state.step + 1), 5000);
+  }
+
   componentWillUnmount() {
     window.removeEventListener("keydown", this._key);
     cancelAnimationFrame(this._raf);
+    clearTimeout(this._auto);
     (this._timers || []).forEach(clearTimeout);
   }
 
@@ -244,12 +297,13 @@ class Component extends DCLogic {
   go(n) {
     const t = Math.max(0, Math.min(STEPS.length - 1, n));
     if (t === this.state.step) return;
+    clearTimeout(this._auto);
     (this._timers || []).forEach(clearTimeout);
     this._timers = [];
     // 1) fade the spotlight + card out, 2) crossfade the screen, 3) fade back in
     this.setState({ visible: false });
     this._timers.push(setTimeout(() => this.setState({ step: t }), 170));
-    this._timers.push(setTimeout(() => this.setState({ visible: true }), 400));
+    this._timers.push(setTimeout(() => this.setState({ visible: true }, () => this.schedule()), 400));
   }
 
   renderVals() {
@@ -311,7 +365,7 @@ class Component extends DCLogic {
         border: "none",
         padding: 0,
         cursor: "pointer",
-        background: k === i ? accent : "#D9D9D9",
+        background: k === i ? accent : (k < i ? "#C7C2FA" : "#D9D9D9"),
         transition: "all 200ms ease-out"
       }
     }));
@@ -362,6 +416,15 @@ class Component extends DCLogic {
       color: disabled ? "#999999" : (kind === "primary" ? "#FFFFFF" : "#555555")
     });
 
+    const auto = this.state.mode === "auto";
+
+    const tab = on => ({
+      height: "28px", padding: "0 14px", borderRadius: "6px", border: "none",
+      fontFamily: "inherit", fontSize: "13px", fontWeight: on ? 700 : 500, whiteSpace: "nowrap",
+      background: on ? accent : "transparent", color: on ? "#FFFFFF" : "#777777",
+      cursor: "pointer", transition: "all .15s ease-out"
+    });
+
     const pills = STEPS.map((st, n) => ({
       label: (n + 1) + ". " + st.short,
       onClick: () => this.go(n),
@@ -394,6 +457,12 @@ class Component extends DCLogic {
       dots,
       steps: chips,
       pills,
+      stepNo: i + 1,
+      total: STEPS.length,
+      setTutorial: () => this.setMode("tutorial"),
+      setAuto: () => this.setMode("auto"),
+      manualTabStyle: tab(!auto),
+      autoTabStyle: tab(auto),
       progressStyle: { width: ((i + 1) / STEPS.length * 100).toFixed(1) + "%" },
       prevStyle: btn("sub", i === 0),
       nextStyle: btn("primary", false),
