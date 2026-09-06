@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/matholic-design-system-e6d31222-91d3-47b9-aebe-84a65a8b8cf0/fonts/suit.css">
+<link rel="stylesheet" href="_ds/matholic-design-system-e6d31222-91d3-47b9-aebe-84a65a8b8cf0/colors_and_type.css">
+<link rel="stylesheet" href="_ds/matholic-design-system-e6d31222-91d3-47b9-aebe-84a65a8b8cf0/styles.css">
+<script src="_ds/matholic-design-system-e6d31222-91d3-47b9-aebe-84a65a8b8cf0/_ds_bundle.js"></script>
+<style>
+  html, body { margin:0; padding:0; }
+  body { font-family:"SUIT Variable","SUIT",sans-serif; background:#E9E8FA; -webkit-font-smoothing:antialiased; }
+  a { color:#6155F5; text-decoration:none; }
+  a:hover { color:#4A3EE0; text-decoration:underline; }
+  @keyframes mhPulse {
+    0%,100% { box-shadow:0 0 0 4px rgba(97,85,245,0.30); }
+    50% { box-shadow:0 0 0 10px rgba(97,85,245,0.10); }
+  }
+  .mh-nav{position:sticky; top:0; z-index:40; background:#FFFFFF; border-bottom:1px solid #EEEEEE;}
+  .mh-nav-inner{max-width:1200px; margin:0 auto; padding:0 24px; height:60px; display:flex; align-items:center; gap:24px;}
+  .mh-nav-logo{display:flex; align-items:center; gap:8px; text-decoration:none; flex:0 0 auto;}
+  .mh-nav-logo img{height:20px; width:auto; display:block;}
+  .mh-nav-logo span{font-size:13px; font-weight:700; color:#212121; letter-spacing:-0.01em; white-space:nowrap;}
+  .mh-nav-links{display:flex; align-items:center; gap:4px; flex:1; overflow-x:auto;}
+  .mh-nav-link{display:inline-flex; align-items:center; height:34px; padding:0 14px; border-radius:8px; font-size:13px; font-weight:600; color:#777777; text-decoration:none; white-space:nowrap; transition:all .15s ease-out;}
+  .mh-nav-link:hover{background:#F7F8F9; color:#212121; text-decoration:none;}
+  .mh-nav-link.active{background:#EFEEFE; color:#6155F5; font-weight:700;}
+</style>
+</helmet>
+<div class="mh-nav">
+  <div class="mh-nav-inner">
+    <a class="mh-nav-logo" href="index.html">
+      <img src="assets/matholic_logo.png" alt="MATHOLIC">
+      <span>AI 서술형채점</span>
+    </a>
+    <nav class="mh-nav-links">
+      <a class="mh-nav-link" href="index.html">홈</a>
+      <a class="mh-nav-link active" href="tutorial-1.html">Ⅰ. 학습지 출제</a>
+      <a class="mh-nav-link" href="tutorial-2.html">Ⅱ. OMR답안지 출력</a>
+      <a class="mh-nav-link" href="tutorial-3.html">Ⅲ. AI 채점 확인</a>
+    </nav>
+  </div>
+</div>
+<div style="min-height:100vh; padding:28px 20px 40px; box-sizing:border-box; display:flex; justify-content:center; align-items:flex-start;">
+  <div style="width:100%; max-width:1200px; background:#FFFFFF; border-radius:16px; border:1px solid #DDDBF6; box-shadow:0 12px 40px rgba(30,24,90,0.14); overflow:hidden;">
+
+    <div style="display:flex; align-items:flex-start; gap:20px; padding:24px 28px 18px; border-bottom:1px solid #EEEEEE; flex-wrap:wrap;">
+      <div style="flex:1 1 320px; min-width:0; display:flex; flex-direction:column; gap:8px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="display:inline-flex; align-items:center; height:22px; padding:0 8px; border-radius:6px; background:#6155F5; color:#FFFFFF; font-size:12px; font-weight:700; letter-spacing:-0.005em;">NEW</span>
+          <span style="font-size:13px; font-weight:600; color:#6155F5; letter-spacing:-0.005em; white-space:nowrap;">AI 서술형 첨삭</span>
+        </div>
+        <h1 style="margin:0; font-size:24px; font-weight:700; color:#212121; letter-spacing:-0.01em;">Ⅰ. 서술형 학습지 출제</h1>
+        <p style="margin:0; font-size:14px; line-height:22px; color:#555555; text-wrap:pretty;">학교의 서술형 문제를 대비하기 위한 학습지를 출제합니다.</p>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px; flex:0 0 auto;">
+        <div style="display:flex; gap:0; padding:3px; background:#F4F3FE; border:1px solid #E3E1F7; border-radius:8px;">
+          <button type="button" onClick="{{ setManual }}" style="{{ manualTabStyle }}">튜토리얼</button>
+          <button type="button" onClick="{{ setAuto }}" style="{{ autoTabStyle }}">자동재생</button>
+        </div>
+        <span style="font-size:13px; font-weight:600; color:#777777; white-space:nowrap;">STEP <span style="color:#6155F5; font-weight:700;">{{ stepNo }}</span> / {{ total }}</span>
+      </div>
+    </div>
+
+    <div style="height:4px; background:#F0EFFC;">
+      <div style="height:100%; background:#6155F5; border-radius:0 4px 4px 0; transition:width .25s ease-out;" style="{{ progressStyle }}"></div>
+    </div>
+
+    <sc-if value="{{ showStepList }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex; gap:8px; padding:14px 28px; overflow-x:auto; border-bottom:1px solid #EEEEEE;">
+        <sc-for list="{{ pills }}" as="p" hint-placeholder-count="9">
+          <button type="button" onClick="{{ p.onClick }}" style="{{ p.style }}">{{ p.label }}</button>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <div style="padding:22px 28px 8px;">
+      <div style="position:relative; border:1px solid #D9D9D9; border-radius:10px; overflow:hidden; background:#FFFFFF; line-height:0;">
+        <img ref="{{ imgRef }}" src="uploads/t1/step1.png" alt="매쓰홀릭 화면" style="display:block; width:100%; height:auto;">
+
+        <div style="{{ overlayStyle }}">
+          <svg style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none;">
+            <defs>
+              <mask id="mhSpot">
+                <rect x="0" y="0" width="100%" height="100%" fill="#ffffff"></rect>
+                <sc-for list="{{ holes }}" as="h" hint-placeholder-count="1">
+                  <rect x="{{ h.x }}" y="{{ h.y }}" width="{{ h.w }}" height="{{ h.h }}" rx="9" ry="9" fill="#000000"></rect>
+                </sc-for>
+              </mask>
+            </defs>
+            <rect x="0" y="0" width="100%" height="100%" mask="url(#mhSpot)" style="{{ dimStyle }}"></rect>
+          </svg>
+
+          <sc-for list="{{ rings }}" as="r" hint-placeholder-count="1">
+            <div onClick="{{ next }}" title="여기를 눌러 다음 단계로" style="{{ r.style }}"></div>
+          </sc-for>
+
+          <div style="{{ tipStyle }}">
+            <div style="{{ arrowStyle }}"></div>
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+              <span style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; flex:0 0 auto; border-radius:999px; background:#6155F5; color:#FFFFFF; font-size:11px; font-weight:700;">{{ stepNo }}</span>
+              <strong style="font-size:14px; font-weight:700; color:#212121; letter-spacing:-0.005em;">{{ title }}</strong>
+            </div>
+            <p style="margin:0; font-size:13px; line-height:21px; color:#555555; text-wrap:pretty;">{{ desc }}</p>
+          </div>
+
+          <sc-if value="{{ hasNote }}" hint-placeholder-val="{{ true }}">
+            <div style="position:absolute; left:2.5%; top:50%; transform:translateY(-50%); width:min(42%, 460px); padding:16px 20px; box-sizing:border-box; background:#FFFFFF; border:1px solid #6155F5; border-left:5px solid #6155F5; border-radius:10px; box-shadow:0 8px 24px rgba(30,24,90,0.20); line-height:normal; z-index:4; display:flex; flex-direction:column; gap:6px;">
+              <strong style="font-size:14px; font-weight:700; color:#4A3EE0; letter-spacing:-0.005em; word-break:keep-all;">{{ noteTitle }}</strong>
+              <p style="margin:0; font-size:13px; line-height:21px; color:#555555; word-break:keep-all; text-wrap:pretty;">{{ noteBody }}</p>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; padding:16px 28px 24px; flex-wrap:wrap;">
+      <div style="display:flex; flex-direction:column; gap:4px; min-width:0;">
+        <span style="font-size:13px; font-weight:600; color:#6155F5;">{{ hint }}</span>
+        <span style="font-size:12px; color:#999999;">키보드 좌·우 방향키로도 이동할 수 있습니다.</span>
+      </div>
+      <div style="display:flex; gap:12px; flex:0 0 auto;">
+        <button type="button" onClick="{{ restart }}" style="{{ ghostStyle }}">처음부터</button>
+        <button type="button" onClick="{{ prev }}" style="{{ prevStyle }}">← 이전</button>
+        <button type="button" onClick="{{ next }}" style="{{ nextStyle }}">{{ nextLabel }}</button>
+      </div>
+    </div>
+  </div>
+
+  <sc-if value="{{ showComplete }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center; background:rgba(20,18,43,0.55); padding:20px; box-sizing:border-box;">
+      <div style="width:100%; max-width:420px; background:#FFFFFF; border-radius:16px; box-shadow:0 20px 60px rgba(30,24,90,0.35); padding:32px 28px 24px; box-sizing:border-box; display:flex; flex-direction:column; gap:16px; text-align:center;">
+        <div style="width:56px; height:56px; margin:0 auto; border-radius:999px; background:#EFEEFE; display:flex; align-items:center; justify-content:center;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6155F5" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg>
+        </div>
+        <div>
+          <h2 style="margin:0 0 6px; font-size:19px; font-weight:700; color:#212121; letter-spacing:-0.01em;">Ⅰ. 서술형 학습지 출제, 끝까지 확인했어요</h2>
+          <p style="margin:0; font-size:14px; line-height:22px; color:#555555; text-wrap:pretty;">이제 만든 학습지를 실제 시험처럼 OMR 답안지로 출력해 볼 차례입니다.</p>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:10px; margin-top:8px;">
+          <button type="button" onClick="{{ goNextSection }}" style="height:44px; border-radius:8px; border:1px solid #6155F5; background:#6155F5; color:#FFFFFF; font-family:inherit; font-size:14px; font-weight:700; cursor:pointer;">다음 섹션: OMR답안지 출력 →</button>
+          <div style="display:flex; gap:10px;">
+            <button type="button" onClick="{{ markComplete }}" style="flex:1; height:40px; border-radius:8px; border:1px solid #6155F5; background:{{ markCompleteBg }}; color:#6155F5; font-family:inherit; font-size:13px; font-weight:600; cursor:pointer;">{{ markCompleteLabel }}</button>
+            <button type="button" onClick="{{ goHome }}" style="flex:1; height:40px; border-radius:8px; border:1px solid #D9D9D9; background:#FFFFFF; color:#555555; font-family:inherit; font-size:13px; font-weight:600; cursor:pointer;">처음으로</button>
+          </div>
+          <button type="button" onClick="{{ closeComplete }}" style="height:32px; border:none; background:transparent; color:#999999; font-family:inherit; font-size:12px; cursor:pointer;">닫고 계속 둘러보기</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;dimOpacity&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:0.55,&quot;min&quot;:0.2,&quot;max&quot;:0.8,&quot;step&quot;:0.05,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;하이라이트&quot;},&quot;pulseHighlight&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;하이라이트&quot;},&quot;autoplaySeconds&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:4,&quot;min&quot;:2,&quot;max&quot;:10,&quot;step&quot;:0.5,&quot;unit&quot;:&quot;초&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;자동재생&quot;},&quot;showStepList&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;레이아웃&quot;}}">
+const IMG = n => (n === 2 ? 'uploads/t1/step1.png' : n === 3 ? 'uploads/t1/step2.png' : 'uploads/t1/image%20' + n + '.png');
+
+const STEPS = [
+  { img: 2, pill: '학습지 만들기', title: '[학습지] > [+ 새 학습지 만들기]',
+    desc: '학습지를 출제하기 위해 상단 메뉴의 학습지를 선택 후 [+ 새 학습지 만들기]를 선택합니다.',
+    rects: [{ x: 34.7, y: 1.4, w: 4.4, h: 5.4 }, { x: 18.3, y: 10.7, w: 9.7, h: 4.6 }],
+    tip: { x: 18.3, y: 17.4, arrow: 'up' } },
+  { img: 3, pill: '내신 빈출 공략', title: '[내신 빈출 공략] 선택',
+    desc: '실제 기출문제에 자주 출제하는 문항들을 선택하기 위해 내신 빈출 공략을 선택합니다.',
+    rects: [{ x: 28.7, y: 41.0, w: 19.4, h: 12.2 }],
+    tip: { x: 49.5, y: 41.5, arrow: 'left' } },
+  { img: 4, pill: '과정 선택', title: '[중등 2-2 (2022개정)] 선택',
+    desc: '출제할 과정을 선택합니다.',
+    rects: [{ x: 36.8, y: 37.0, w: 24.8, h: 17.8 }],
+    tip: { x: 37.5, y: 56.5, arrow: 'up' } },
+  { img: 5, pill: '문항 선택', title: '선택된 문제 3개 > [다음으로]',
+    desc: '출제할 문항을 선택 후 [다음으로 →] 버튼을 선택합니다.',
+    rects: [
+      { x: 16.6, y: 17.2, w: 16.7, h: 24.9 },
+      { x: 33.6, y: 17.2, w: 16.7, h: 24.9 },
+      { x: 16.6, y: 42.6, w: 16.7, h: 31.8 },
+      { x: 78.6, y: 93.0, w: 20.8, h: 6.4 }
+    ],
+    tip: { x: 99.0, y: 91.5, arrow: 'down', flipX: true } },
+  { img: 6, pill: '서술형 탭', title: '[서술형] 탭 선택',
+    desc: '서술형 문항을 출제하기 위해 서술형 탭을 선택하여, 문제를 추가합니다.',
+    rects: [{ x: 67.7, y: 6.6, w: 4.6, h: 5.0 }],
+    tip: { x: 61.0, y: 12.8, arrow: 'up' },
+    note: { title: 'TIP) 학교 시험처럼 서술형 문항을 문제지의 맨 마지막에 배치하려면?',
+            body: '왼쪽 문제지의 마지막 문제를 선택 후 [서술형 문제]를 추가하면, 해당 문제의 아래에 서술형 문제들이 구성됩니다.' } },
+  { img: 7, pill: '문제 확인', title: '추가된 문제 확인',
+    desc: '추가된 문제를 확인하며 [다음으로 →] 버튼을 선택합니다.',
+    rects: [{ x: 25.0, y: 47.3, w: 22.6, h: 37.8 }, { x: 92.2, y: 93.2, w: 7.2, h: 6.0 }],
+    tip: { x: 48.6, y: 50.0, arrow: 'left' } },
+  { img: 8, pill: '출제 안내', title: '[서술형 출제 안내] 설정',
+    desc: '서술형 문항을 구분할 수 있도록 서술형 출제 안내를 선택하여 문항번호를 입력합니다.',
+    rects: [{ x: 50.3, y: 48.1, w: 22.4, h: 4.2 }],
+    tip: { x: 50.3, y: 54.2, arrow: 'up' } },
+  { img: 9, pill: '안내 문구', title: '학습지에 안내 문구 표시',
+    desc: '좌측 미리보기에 [다음부터는 서술형 문제입니다. 각 문제의 풀이 과정을 쓰고 답을 구하세요.] 안내가 추가됩니다.',
+    rects: [{ x: 26.6, y: 30.1, w: 21.0, h: 5.8 }, { x: 59.1, y: 55.4, w: 4.9, h: 3.4 }],
+    tip: { x: 48.8, y: 30.0, arrow: 'left' } },
+  { img: 10, pill: '생성 완료', title: '학습지 생성 완료',
+    desc: '학습지 생성이 완료되어 학습할 학생을 추가 후 문제지와 OMR 답안지를 출력합니다.',
+    rects: [{ x: 35.2, y: 20.8, w: 29.6, h: 58.0 }],
+    tip: { x: 66.5, y: 38.0, arrow: 'left' } }
+];
+
+const PROGRESS_KEY = 'mh-ai-grading-tutorial-progress';
+function readProgress() {
+  try { return JSON.parse(localStorage.getItem(PROGRESS_KEY) || '{}'); } catch (e) { return {}; }
+}
+function markSectionDone(id) {
+  try {
+    const p = readProgress();
+    p[id] = true;
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(p));
+  } catch (e) {}
+}
+
+class Component extends DCLogic {
+  state = { i: 0, ready: false, auto: false, showComplete: false, marked: false };
+  imgRef = React.createRef();
+
+  componentDidMount() {
+    STEPS.forEach(s => { const im = new Image(); im.src = IMG(s.img); });
+    this.syncImage();
+    this.setState({ marked: !!readProgress().t1 });
+    this._key = e => {
+      if (e.key === 'ArrowRight') this.go(1);
+      if (e.key === 'ArrowLeft') this.go(-1);
+    };
+    window.addEventListener('keydown', this._key);
+  }
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this._key);
+    clearTimeout(this._timer);
+  }
+  componentDidUpdate() { this.syncImage(); this.schedule(); }
+
+  /* swap the screenshot first, reveal the spotlight only once it has painted */
+  syncImage() {
+    const el = this.imgRef.current;
+    if (!el) return;
+    const src = IMG(STEPS[this.state.i].img);
+    if (!el.getAttribute('src').endsWith(src)) {
+      el.setAttribute('src', src);
+      const reveal = () => {
+        if (this.imgRef.current !== el) return;
+        requestAnimationFrame(() => this.setState({ ready: true }));
+      };
+      if (el.complete && el.naturalWidth) reveal();
+      else el.onload = reveal;
+    } else if (!this.state.ready && el.complete && el.naturalWidth) {
+      this.setState({ ready: true });
+    }
+  }
+
+  schedule() {
+    clearTimeout(this._timer);
+    if (!this.state.auto || !this.state.ready) return;
+    if (this.state.i >= STEPS.length - 1) { this.setState({ auto: false }); return; }
+    const ms = (this.props.autoplaySeconds ?? 4) * 1000;
+    this._timer = setTimeout(() => this.go(1), ms);
+  }
+
+  go(d) {
+    this.setState(s => {
+      if (d > 0 && s.i >= STEPS.length - 1) return { showComplete: true };
+      const i = Math.min(STEPS.length - 1, Math.max(0, s.i + d));
+      return i === s.i ? null : { i: i, ready: false };
+    });
+  }
+
+  jump(n) {
+    this.setState(s => (n === s.i ? null : { i: n, ready: false }));
+  }
+
+  markComplete() {
+    markSectionDone('t1');
+    this.setState({ marked: true });
+  }
+
+  tipBox(tip) {
+    const base = {
+      position: 'absolute', width: 'min(34%, 360px)', minWidth: '210px',
+      background: '#FFFFFF', border: '1px solid #6155F5', borderRadius: '10px',
+      padding: '16px 20px', boxSizing: 'border-box', lineHeight: 'normal',
+      boxShadow: '0 8px 24px rgba(30,24,90,0.18)', zIndex: 3,
+      wordBreak: 'keep-all', overflowWrap: 'break-word',
+      left: Math.min(tip.x, tip.flipX ? 100 : 64) + '%', top: tip.y + '%'
+    };
+    const tx = (tip.flipX || tip.arrow === 'right') ? '-100%' : '0';
+    const ty = tip.arrow === 'down' ? '-100%' : '0';
+    if (tx !== '0' || ty !== '0') base.transform = 'translate(' + tx + ',' + ty + ')';
+    return base;
+  }
+
+  arrowBox(tip) {
+    const a = {
+      position: 'absolute', width: '10px', height: '10px', background: '#FFFFFF',
+      borderLeft: '1px solid #6155F5', borderTop: '1px solid #6155F5', transform: 'rotate(45deg)'
+    };
+    if (tip.arrow === 'up') { a.top = '-6px'; a.left = '24px'; }
+    if (tip.arrow === 'down') {
+      a.bottom = '-6px'; a.transform = 'rotate(225deg)';
+      if (tip.flipX) a.right = '24px'; else a.left = '24px';
+    }
+    if (tip.arrow === 'left') { a.left = '-6px'; a.top = '20px'; a.transform = 'rotate(-45deg)'; }
+    if (tip.arrow === 'right') { a.right = '-6px'; a.top = '20px'; a.transform = 'rotate(135deg)'; }
+    return a;
+  }
+
+  renderVals() {
+    const i = this.state.i;
+    const s = STEPS[i];
+    const dim = this.props.dimOpacity ?? 0.55;
+    const pulse = this.props.pulseHighlight ?? true;
+
+    const btn = (kind, disabled) => ({
+      height: '40px', padding: '0 20px', borderRadius: '6px', fontFamily: 'inherit',
+      fontSize: '14px', fontWeight: 600, letterSpacing: '-0.005em', whiteSpace: 'nowrap',
+      cursor: disabled ? 'default' : 'pointer', transition: 'all .15s ease-out',
+      border: kind === 'primary' ? '1px solid #6155F5' : '1px solid #D9D9D9',
+      background: disabled ? '#F7F8F9' : (kind === 'primary' ? '#6155F5' : '#FFFFFF'),
+      color: disabled ? '#999999' : (kind === 'primary' ? '#FFFFFF' : '#555555')
+    });
+
+    const tab = on => ({
+      height: '28px', padding: '0 14px', borderRadius: '6px', border: 'none',
+      fontFamily: 'inherit', fontSize: '13px', fontWeight: on ? 700 : 500, whiteSpace: 'nowrap',
+      background: on ? '#6155F5' : 'transparent', color: on ? '#FFFFFF' : '#777777',
+      cursor: 'pointer', transition: 'all .15s ease-out'
+    });
+
+    return {
+      stepNo: i + 1,
+      total: STEPS.length,
+      title: s.title,
+      desc: s.desc,
+      imgRef: this.imgRef,
+      showStepList: this.props.showStepList ?? true,
+      progressStyle: { width: ((i + 1) / STEPS.length * 100).toFixed(1) + '%' },
+      overlayStyle: {
+        position: 'absolute', inset: 0,
+        opacity: this.state.ready ? 1 : 0,
+        transition: 'opacity .18s ease-out'
+      },
+      dimStyle: { fill: '#14122B', fillOpacity: dim },
+      holes: s.rects.map(r => ({ x: r.x + '%', y: r.y + '%', w: r.w + '%', h: r.h + '%' })),
+      rings: s.rects.map(r => ({
+        style: {
+          position: 'absolute', left: r.x + '%', top: r.y + '%', width: r.w + '%', height: r.h + '%',
+          border: '3px solid #6155F5', borderRadius: '9px', boxSizing: 'border-box',
+          cursor: 'pointer', zIndex: 2,
+          animation: pulse ? 'mhPulse 1.8s ease-in-out infinite' : 'none',
+          boxShadow: pulse ? undefined : '0 0 0 4px rgba(97,85,245,0.28)'
+        }
+      })),
+      hasNote: !!s.note,
+      noteTitle: s.note ? s.note.title : '',
+      noteBody: s.note ? s.note.body : '',
+      tipStyle: this.tipBox(s.tip),
+      arrowStyle: this.arrowBox(s.tip),
+      hint: this.state.auto ? '자동재생 중입니다. 튜토리얼을 누르면 직접 진행할 수 있습니다.' : '표시된 곳을 눌러 다음 단계로 이동합니다.',
+      next: () => this.go(1),
+      prev: () => this.go(-1),
+      restart: () => this.jump(0),
+      setManual: () => { clearTimeout(this._timer); this.setState({ auto: false }); },
+      setAuto: () => this.setState(st => ({ auto: true, i: st.i >= STEPS.length - 1 ? 0 : st.i, ready: st.i >= STEPS.length - 1 ? false : st.ready })),
+      manualTabStyle: tab(!this.state.auto),
+      autoTabStyle: tab(this.state.auto),
+      nextLabel: i === STEPS.length - 1 ? '완료' : '다음으로 →',
+      nextStyle: btn('primary', false),
+      prevStyle: btn('sub', i === 0),
+      ghostStyle: btn('sub', false),
+      showComplete: this.state.showComplete,
+      closeComplete: () => this.setState({ showComplete: false }),
+      markComplete: () => this.markComplete(),
+      markCompleteLabel: this.state.marked ? '완료 처리됨 ✓' : '이 섹션 완료 표시',
+      markCompleteBg: this.state.marked ? '#EFEEFE' : '#FFFFFF',
+      goNextSection: () => { markSectionDone('t1'); location.href = 'tutorial-2.html'; },
+      goHome: () => { location.href = 'index.html'; },
+      pills: STEPS.map((st, n) => ({
+        label: (n + 1) + '. ' + st.pill,
+        onClick: () => this.jump(n),
+        style: {
+          flex: '0 0 auto', height: '30px', padding: '0 12px', borderRadius: '999px', whiteSpace: 'nowrap',
+          fontFamily: 'inherit', fontSize: '13px', fontWeight: n === i ? 700 : 500,
+          cursor: 'pointer', transition: 'all .15s ease-out',
+          border: n === i ? '1px solid #6155F5' : '1px solid #E3E1F7',
+          background: n === i ? '#EFEEFE' : '#FFFFFF',
+          color: n === i ? '#6155F5' : (n < i ? '#555555' : '#999999')
+        }
+      }))
+    };
+  }
+}
+
+</script>
+</body>
+</html>

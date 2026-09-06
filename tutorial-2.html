@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/matholic-design-system-e6d31222-91d3-47b9-aebe-84a65a8b8cf0/fonts/suit.css">
+<link rel="stylesheet" href="_ds/matholic-design-system-e6d31222-91d3-47b9-aebe-84a65a8b8cf0/fonts/jetbrains-mono.css">
+<link rel="stylesheet" href="_ds/matholic-design-system-e6d31222-91d3-47b9-aebe-84a65a8b8cf0/colors_and_type.css">
+<link rel="stylesheet" href="_ds/matholic-design-system-e6d31222-91d3-47b9-aebe-84a65a8b8cf0/styles.css">
+<script src="_ds/matholic-design-system-e6d31222-91d3-47b9-aebe-84a65a8b8cf0/_ds_bundle.js"></script>
+<style>
+  body { margin: 0; background: #F7F8F9; font-family: "SUIT Variable", SUIT, sans-serif; }
+  a { color: #6155F5; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .mh-nav{position:sticky; top:0; z-index:40; background:#FFFFFF; border-bottom:1px solid #EEEEEE;}
+  .mh-nav-inner{max-width:1200px; margin:0 auto; padding:0 24px; height:60px; display:flex; align-items:center; gap:24px;}
+  .mh-nav-logo{display:flex; align-items:center; gap:8px; text-decoration:none; flex:0 0 auto;}
+  .mh-nav-logo img{height:20px; width:auto; display:block;}
+  .mh-nav-logo span{font-size:13px; font-weight:700; color:#212121; letter-spacing:-0.01em; white-space:nowrap;}
+  .mh-nav-links{display:flex; align-items:center; gap:4px; flex:1; overflow-x:auto;}
+  .mh-nav-link{display:inline-flex; align-items:center; height:34px; padding:0 14px; border-radius:8px; font-size:13px; font-weight:600; color:#777777; text-decoration:none; white-space:nowrap; transition:all .15s ease-out;}
+  .mh-nav-link:hover{background:#F7F8F9; color:#212121; text-decoration:none;}
+  .mh-nav-link.active{background:#EFEEFE; color:#6155F5; font-weight:700;}
+</style>
+</helmet>
+<div class="mh-nav">
+  <div class="mh-nav-inner">
+    <a class="mh-nav-logo" href="index.html">
+      <img src="assets/matholic_logo.png" alt="MATHOLIC">
+      <span>AI 서술형채점</span>
+    </a>
+    <nav class="mh-nav-links">
+      <a class="mh-nav-link" href="index.html">홈</a>
+      <a class="mh-nav-link" href="tutorial-1.html">Ⅰ. 학습지 출제</a>
+      <a class="mh-nav-link active" href="tutorial-2.html">Ⅱ. OMR답안지 출력</a>
+      <a class="mh-nav-link" href="tutorial-3.html">Ⅲ. AI 채점 확인</a>
+    </nav>
+  </div>
+</div>
+<div style="min-height: 100vh; padding: 28px 28px 40px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px; align-items: center;">
+
+  <div style="width: 100%; max-width: 1440px; display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+      <div style="font-size: 13px; font-weight: 600; color: #6155F5; letter-spacing: -0.005em;">온보딩 가이드</div>
+      <h1 style="margin: 0; font-size: 24px; font-weight: 700; color: #212121; letter-spacing: -0.005em;">Ⅱ. OMR답안지 출력</h1>
+      <p style="margin: 0; font-size: 14px; line-height: 22px; color: #555;">시험대비 실전감각을 키우기 위해 OMR답안지로 학습을 진행합니다.</p>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <span style="font-size: 13px; color: #777; white-space: nowrap;">{{ counter }}</span>
+      <div style="display: flex; gap: 12px;">
+        <button type="button" onClick="{{ prev }}" disabled="{{ atStart }}" style="height: 32px; padding: 0 14px; border-radius: 6px; border: 1px solid #D9D9D9; background: #fff; color: #555; font-family: inherit; font-size: 14px; font-weight: 500; white-space: nowrap; cursor: pointer; transition: all 150ms ease-out;" style-hover="border-color: #6155F5; color: #6155F5;">뒤로</button>
+        <button type="button" onClick="{{ next }}" style="height: 32px; padding: 0 16px; border-radius: 6px; border: 1px solid #6155F5; background: #6155F5; color: #fff; font-family: inherit; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: all 150ms ease-out;" style-hover="background: #4A3EE0; border-color: #4A3EE0;">{{ nextLabel }}</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="width: 100%; max-width: 1440px; display: flex; gap: 12px; flex-wrap: wrap;">
+    <sc-for list="{{ steps }}" as="s" hint-placeholder-count="3">
+      <button type="button" onClick="{{ s.go }}" style="{{ s.chipStyle }}">
+        <span style="{{ s.noStyle }}">{{ s.no }}</span>
+        <span style="font-size: 14px; font-weight: 500; color: #212121; text-align: left; letter-spacing: -0.005em;">{{ s.short }}</span>
+      </button>
+    </sc-for>
+  </div>
+
+  <div style="width: 100%; max-width: 1440px; position: relative; aspect-ratio: 2881 / 1532; border: 1px solid #D9D9D9; border-radius: 10px; overflow: hidden; background: #fff;">
+    <img src="uploads/t2/image%2021.png" alt="문제지 출력 화면" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 320ms ease-out; opacity: {{ op0 }};">
+    <img src="uploads/t2/image%2022.png" alt="답안 조절바 드래그 화면" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 320ms ease-out; opacity: {{ op1 }};">
+    <img src="uploads/t2/image%2023.png" alt="OMR 답안지 화면" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 320ms ease-out; opacity: {{ op2 }};">
+    <img src="uploads/t2/pasted-1788576872170-0.png" alt="OMR 답안지 초기화면" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 320ms ease-out; opacity: {{ op3 }};">
+
+    <div style="{{ overlayStyle }}">
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%;">
+        <defs>
+          <mask id="omrSpot" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse" x="0" y="0" width="100" height="100">
+            <rect x="0" y="0" width="100" height="100" fill="#fff"></rect>
+            <sc-for list="{{ holes }}" as="h" hint-placeholder-count="0">
+              <rect x="{{ h.x }}" y="{{ h.y }}" width="{{ h.w }}" height="{{ h.h }}" fill="#000"></rect>
+            </sc-for>
+          </mask>
+        </defs>
+        <rect x="0" y="0" width="100" height="100" fill="{{ dimFill }}" mask="url(#omrSpot)"></rect>
+      </svg>
+
+      <sc-for list="{{ rings }}" as="r" hint-placeholder-count="0">
+        <div style="{{ r.style }}"></div>
+      </sc-for>
+
+      <div style="{{ cardStyle }}">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; padding: 0 7px; border-radius: 6px; background: #EFEEFE; color: #6155F5; font-size: 12px; font-weight: 700;">{{ badge }}</span>
+          <span style="font-size: 12px; font-weight: 500; color: #999; white-space: nowrap;">Ⅱ. OMR답안지 출력</span>
+        </div>
+        <div style="font-size: 16px; font-weight: 700; color: #212121; line-height: 24px; letter-spacing: -0.005em; text-wrap: pretty;">{{ title }}</div>
+        <div style="font-size: 14px; line-height: 22px; color: #555; text-wrap: pretty;">{{ desc }}</div>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 4px;">
+          <div style="display: flex; gap: 6px; align-items: center;">
+            <sc-for list="{{ dots }}" as="d" hint-placeholder-count="4">
+              <button type="button" onClick="{{ d.go }}" aria-label="{{ d.label }}" style="{{ d.style }}"></button>
+            </sc-for>
+          </div>
+          <div style="display: flex; gap: 12px;">
+            <button type="button" onClick="{{ prev }}" disabled="{{ atStart }}" style="height: 32px; padding: 0 12px; border-radius: 6px; border: 1px solid #D9D9D9; background: #fff; color: #555; font-family: inherit; font-size: 14px; font-weight: 500; white-space: nowrap; cursor: pointer; transition: all 150ms ease-out;" style-hover="border-color: #6155F5; color: #6155F5;">뒤로</button>
+            <button type="button" onClick="{{ next }}" style="height: 32px; padding: 0 14px; border-radius: 6px; border: 1px solid #6155F5; background: #6155F5; color: #fff; font-family: inherit; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: all 150ms ease-out;" style-hover="background: #4A3EE0; border-color: #4A3EE0;">{{ nextLabel }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <sc-if value="{{ showComplete }}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; background: rgba(20,18,43,0.55); padding: 20px; box-sizing: border-box;">
+      <div style="width: 100%; max-width: 420px; background: #fff; border-radius: 16px; box-shadow: 0 20px 60px rgba(30,24,90,0.35); padding: 32px 28px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px; text-align: center;">
+        <div style="width: 56px; height: 56px; margin: 0 auto; border-radius: 999px; background: #EFEEFE; display: flex; align-items: center; justify-content: center;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6155F5" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg>
+        </div>
+        <div>
+          <h2 style="margin: 0 0 6px; font-size: 19px; font-weight: 700; color: #212121; letter-spacing: -0.01em;">Ⅱ. OMR답안지 출력, 끝까지 확인했어요</h2>
+          <p style="margin: 0; font-size: 14px; line-height: 22px; color: #555;">이제 학생이 제출한 OMR 답안을 입력하고 AI 서술형 채점까지 확인해 볼 차례입니다.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 8px;">
+          <button type="button" onClick="{{ goNextSection }}" style="height: 44px; border-radius: 8px; border: 1px solid #6155F5; background: #6155F5; color: #fff; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer;">다음 섹션: OMR 답안 입력 &amp; AI 채점 →</button>
+          <div style="display: flex; gap: 10px;">
+            <button type="button" onClick="{{ markComplete }}" style="flex: 1; height: 40px; border-radius: 8px; border: 1px solid #6155F5; background: {{ markCompleteBg }}; color: #6155F5; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer;">{{ markCompleteLabel }}</button>
+            <button type="button" onClick="{{ goHome }}" style="flex: 1; height: 40px; border-radius: 8px; border: 1px solid #D9D9D9; background: #fff; color: #555; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer;">처음으로</button>
+          </div>
+          <button type="button" onClick="{{ closeComplete }}" style="height: 32px; border: none; background: transparent; color: #999; font-family: inherit; font-size: 12px; cursor: pointer;">닫고 계속 둘러보기</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;accentColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#6155F5&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#6155F5&quot;]},&quot;dimOpacity&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:0.55,&quot;min&quot;:0.2,&quot;max&quot;:0.8,&quot;step&quot;:0.05,&quot;tsType&quot;:&quot;number&quot;}}">
+const SHOTS = [
+  "uploads/t2/image%2021.png",
+  "uploads/t2/image%2022.png",
+  "uploads/t2/image%2023.png",
+  "uploads/t2/pasted-1788576872170-0.png"
+];
+
+const STEPS = [
+  {
+    shot: 0, badge: "안내", short: "온보딩 시작",
+    title: "OMR답안지로 실전 감각 키우기",
+    desc: "시험대비 실전감각을 키우기 위해 OMR답안지로 학습을 진행합니다. 네 단계만 따라오세요.",
+    holes: [], card: { left: 50, top: 50, center: true }
+  },
+  {
+    shot: 0, badge: "1", short: "[문제지 출력]에서 [OMR답안지] 선택",
+    title: "[문제지 출력] → [OMR답안지] 버튼 선택",
+    desc: "문제지 출력 화면에서 OMR답안지만 선택합니다.",
+    holes: [
+      { x: 1.4, y: 6.2, w: 5.4, h: 5.4 },
+      { x: 85.3, y: 51.0, w: 13.3, h: 3.4 }
+    ],
+    card: { left: 60, top: 60 }
+  },
+  {
+    shot: 3, badge: "2", short: "OMR답안지 초기화면 확인",
+    title: "[OMR답안지] 선택 직후 초기화면",
+    desc: "OMR답안지를 선택하면 객관식 답안 영역이 먼저 생성됩니다.",
+    holes: [{ x: 31.3, y: 29.4, w: 11.0, h: 22.5 }],
+    card: { left: 47, top: 30 }
+  },
+  {
+    shot: 1, badge: "3", short: "[답안 조절바] 드래그",
+    title: "[답안 조절바]로 영역 조정",
+    desc: "조절바를 위아래로 드래그하여 서술형 답안 영역을 설정할 수 있습니다.",
+    holes: [{ x: 31.5, y: 95.2, w: 40.8, h: 3.6 }],
+    card: { left: 33, top: 56 }
+  },
+  {
+    shot: 2, badge: "4", short: "[답안입력창] 확인 후 [출력하기]",
+    title: "[답안입력창] 확인 후 [출력하기]",
+    desc: "답안 영역 조정이 완료되었다면 출력하여 학생의 학습을 시작합니다.",
+    holes: [
+      { x: 32.3, y: 28.4, w: 10.0, h: 20.5 },
+      { x: 32.3, y: 55.8, w: 41.0, h: 44.2 },
+      { x: 82.3, y: 6.3, w: 11.0, h: 4.4 }
+    ],
+    card: { left: 47, top: 20 }
+  }
+];
+
+const PROGRESS_KEY = 'mh-ai-grading-tutorial-progress';
+function readProgress() {
+  try { return JSON.parse(localStorage.getItem(PROGRESS_KEY) || '{}'); } catch (e) { return {}; }
+}
+function markSectionDone(id) {
+  try {
+    const p = readProgress();
+    p[id] = true;
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(p));
+  } catch (e) {}
+}
+
+class Component extends DCLogic {
+  state = { step: 0, visible: false, showComplete: false, marked: false };
+
+  componentDidMount() {
+    this.setState({ marked: !!readProgress().t2 });
+    this._timers = [];
+    this._raf = requestAnimationFrame(() => this.setState({ visible: true }));
+    this._key = (e) => {
+      if (e.key === "ArrowRight") this.go(this.state.step + 1);
+      if (e.key === "ArrowLeft") this.go(this.state.step - 1);
+    };
+    window.addEventListener("keydown", this._key);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("keydown", this._key);
+    cancelAnimationFrame(this._raf);
+    (this._timers || []).forEach(clearTimeout);
+  }
+
+  markComplete() {
+    markSectionDone('t2');
+    this.setState({ marked: true });
+  }
+
+  go(n) {
+    const t = Math.max(0, Math.min(STEPS.length - 1, n));
+    if (t === this.state.step) return;
+    (this._timers || []).forEach(clearTimeout);
+    this._timers = [];
+    // 1) fade the spotlight + card out, 2) crossfade the screen, 3) fade back in
+    this.setState({ visible: false });
+    this._timers.push(setTimeout(() => this.setState({ step: t }), 170));
+    this._timers.push(setTimeout(() => this.setState({ visible: true }), 400));
+  }
+
+  renderVals() {
+    const i = this.state.step;
+    const on = this.state.visible;
+    const s = STEPS[i];
+    const accent = this.props.accentColor ?? "#6155F5";
+    const dim = this.props.dimOpacity ?? 0.55;
+
+    const op = (k) => (k === s.shot ? 1 : 0);
+
+    const overlayStyle = {
+      position: "absolute",
+      inset: 0,
+      pointerEvents: "none",
+      opacity: on ? 1 : 0,
+      transition: "opacity 220ms ease-out"
+    };
+
+    const rings = s.holes.map((h) => ({
+      style: {
+        position: "absolute",
+        left: h.x + "%", top: h.y + "%", width: h.w + "%", height: h.h + "%",
+        border: "2px solid " + accent,
+        borderRadius: "6px",
+        boxSizing: "border-box",
+        boxShadow: on ? "0 0 0 4px rgba(97,85,245,0.22)" : "0 0 0 0 rgba(97,85,245,0)",
+        transform: on ? "scale(1)" : "scale(1.04)",
+        transition: "box-shadow 320ms ease-out 120ms, transform 320ms ease-out 120ms"
+      }
+    }));
+
+    const cardStyle = {
+      position: "absolute",
+      left: s.card.left + "%",
+      top: s.card.top + "%",
+      width: "min(400px, 42%)",
+      background: "#fff",
+      border: "1px solid #D9D9D9",
+      borderRadius: "10px",
+      padding: "20px",
+      boxSizing: "border-box",
+      display: "flex",
+      flexDirection: "column",
+      gap: "10px",
+      boxShadow: "0 6px 16px rgba(0,35,11,0.2)",
+      pointerEvents: "auto",
+      transform: (s.card.center ? "translate(-50%, -50%)" : "translate(0, 0)") + (on ? " translateY(0)" : " translateY(6px)"),
+      transition: "transform 260ms ease-out 100ms"
+    };
+
+    const dots = STEPS.map((st, k) => ({
+      label: "단계 " + (k + 1),
+      go: () => this.go(k),
+      style: {
+        width: k === i ? "18px" : "6px",
+        height: "6px",
+        borderRadius: "999px",
+        border: "none",
+        padding: 0,
+        cursor: "pointer",
+        background: k === i ? accent : "#D9D9D9",
+        transition: "all 200ms ease-out"
+      }
+    }));
+
+    const chips = STEPS.slice(1).map((st, k) => {
+      const active = k + 1 === i;
+      return {
+        no: String(k + 1),
+        short: st.short,
+        go: () => this.go(k + 1),
+        noStyle: {
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: "20px",
+          height: "20px",
+          borderRadius: "6px",
+          flex: "0 0 auto",
+          fontSize: "12px",
+          fontWeight: 700,
+          background: active ? accent : "#F7F8F9",
+          color: active ? "#fff" : "#777",
+          transition: "all 150ms ease-out"
+        },
+        chipStyle: {
+          flex: "1 1 240px",
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          padding: "14px 16px",
+          borderRadius: "6px",
+          background: active ? "#EFEEFE" : "#fff",
+          border: "1px solid " + (active ? accent : "#D9D9D9"),
+          fontFamily: "inherit",
+          cursor: "pointer",
+          textAlign: "left",
+          transition: "all 150ms ease-out"
+        }
+      };
+    });
+
+    return {
+      op0: op(0), op1: op(1), op2: op(2), op3: op(3),
+      overlayStyle,
+      holes: s.holes,
+      rings,
+      cardStyle,
+      dimFill: "rgba(17,24,39," + dim + ")",
+      badge: s.badge,
+      title: s.title,
+      desc: s.desc,
+      counter: i === 0 ? "시작 안내" : i + " / " + (STEPS.length - 1),
+      nextLabel: i === STEPS.length - 1 ? "완료" : (i === 0 ? "시작하기" : "다음으로"),
+      atStart: i === 0,
+      next: () => (i === STEPS.length - 1 ? this.setState({ showComplete: true }) : this.go(i + 1)),
+      prev: () => this.go(i - 1),
+      dots,
+      steps: chips,
+      showComplete: this.state.showComplete,
+      closeComplete: () => this.setState({ showComplete: false }),
+      markComplete: () => this.markComplete(),
+      markCompleteLabel: this.state.marked ? "완료 처리됨 ✓" : "이 섹션 완료 표시",
+      markCompleteBg: this.state.marked ? "#EFEEFE" : "#fff",
+      goNextSection: () => { markSectionDone('t2'); location.href = 'tutorial-3.html'; },
+      goHome: () => { location.href = 'index.html'; }
+    };
+  }
+}
+</script>
+</body>
+</html>

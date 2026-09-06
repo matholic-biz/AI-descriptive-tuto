@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 서술형채점 튜토리얼</title>
+<link rel="stylesheet" href="_ds/matholic-design-system-e6d31222-91d3-47b9-aebe-84a65a8b8cf0/fonts/suit.css">
+<style>
+  :root{
+    --mh-primary:#6155F5;
+    --mh-primary-hover:#4A3EE0;
+    --mh-primary-tint:#EFEEFE;
+    --mh-primary-tint-2:#F4F3FE;
+    --mh-primary-border:#DDDBF6;
+    --mh-bg-wash:#E9E8FA;
+    --mh-fg:#212121;
+    --mh-fg-2:#555555;
+    --mh-fg-3:#777777;
+    --mh-fg-4:#999999;
+    --mh-line:#D9D9D9;
+    --mh-line-soft:#EEEEEE;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:"SUIT Variable","SUIT","Apple SD Gothic Neo",sans-serif;
+    background:var(--mh-bg-wash);
+    color:var(--mh-fg);
+    -webkit-font-smoothing:antialiased;
+    letter-spacing:-0.005em;
+  }
+  a{color:var(--mh-primary); text-decoration:none;}
+  a:hover{color:var(--mh-primary-hover); text-decoration:underline;}
+  .page{max-width:1200px; margin:0 auto; padding:40px 20px 64px;}
+
+  .panel{
+    background:#FFFFFF; border-radius:16px; border:1px solid var(--mh-primary-border);
+    box-shadow:0 12px 40px rgba(30,24,90,0.14); overflow:hidden;
+  }
+
+  /* ---- hero ---- */
+  .hero{padding:40px 40px 36px; border-bottom:1px solid var(--mh-line-soft);}
+  .badge-row{display:flex; align-items:center; gap:8px; margin-bottom:14px;}
+  .badge-new{
+    display:inline-flex; align-items:center; height:24px; padding:0 10px; border-radius:6px;
+    background:var(--mh-primary); color:#fff; font-size:12px; font-weight:700;
+  }
+  .badge-label{font-size:14px; font-weight:600; color:var(--mh-primary);}
+  .hero h1{margin:0 0 12px; font-size:32px; font-weight:800; letter-spacing:-0.02em; line-height:1.3;}
+  .hero h1 em{color:var(--mh-primary); font-style:normal;}
+  .hero p.lead{margin:0; max-width:720px; font-size:15px; line-height:26px; color:var(--mh-fg-2);}
+  .logo-mark{height:22px; width:auto; display:block;}
+
+  /* ---- differentiation ---- */
+  .section{padding:36px 40px; border-bottom:1px solid var(--mh-line-soft);}
+  .section h2{margin:0 0 6px; font-size:18px; font-weight:700;}
+  .section .sub{margin:0 0 20px; font-size:13px; color:var(--mh-fg-3);}
+  .diff-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px;}
+  @media (max-width:860px){ .diff-grid{grid-template-columns:1fr;} }
+  .diff-card{border:1px solid var(--mh-line); border-radius:12px; padding:20px; display:flex; flex-direction:column; gap:10px;}
+  .diff-card .tag{
+    align-self:flex-start; font-size:11px; font-weight:700; color:var(--mh-fg-4);
+    background:#F7F8F9; border:1px solid var(--mh-line); border-radius:999px; padding:3px 10px;
+  }
+  .diff-card h3{margin:0; font-size:15px; font-weight:700;}
+  .diff-card p{margin:0; font-size:13px; line-height:21px; color:var(--mh-fg-2);}
+  .diff-card.ours{border-color:var(--mh-primary); background:var(--mh-primary-tint);}
+  .diff-card.ours .tag{background:var(--mh-primary); color:#fff; border-color:var(--mh-primary);}
+
+  /* ---- menu cards ---- */
+  .menu-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px;}
+  @media (max-width:900px){ .menu-grid{grid-template-columns:1fr;} }
+  .menu-card{
+    position:relative; border:1px solid var(--mh-line); border-radius:12px; padding:22px 20px 20px;
+    display:flex; flex-direction:column; gap:12px; background:#fff; transition:all .15s ease-out;
+  }
+  .menu-card:hover{border-color:var(--mh-primary); box-shadow:0 8px 20px rgba(97,85,245,0.15);}
+  .menu-top{display:flex; align-items:center; justify-content:space-between; gap:8px;}
+  .roman{
+    width:34px; height:34px; border-radius:8px; background:var(--mh-primary-tint); color:var(--mh-primary);
+    display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:800;
+  }
+  .done-pill{
+    display:none; align-items:center; gap:4px; font-size:11px; font-weight:700; color:#20AF66;
+    background:#F6FFED; border:1px solid #B7EB8F; border-radius:999px; padding:3px 8px;
+  }
+  .done-pill.show{display:inline-flex;}
+  .menu-card h3{margin:0; font-size:16px; font-weight:700; line-height:24px;}
+  .menu-card p{margin:0; font-size:13px; line-height:20px; color:var(--mh-fg-2); flex:1;}
+  .menu-cta{
+    display:inline-flex; align-items:center; justify-content:center; height:38px; border-radius:8px;
+    border:1px solid var(--mh-primary); background:var(--mh-primary); color:#fff; font-size:13px; font-weight:700;
+    text-decoration:none; transition:all .15s ease-out;
+  }
+  .menu-cta:hover{background:var(--mh-primary-hover); border-color:var(--mh-primary-hover); text-decoration:none; color:#fff;}
+
+  .progress-strip{display:flex; align-items:center; gap:10px; padding:16px 40px; background:#F7F8F9;}
+  .progress-strip .track{flex:1; height:6px; border-radius:999px; background:var(--mh-line); overflow:hidden;}
+  .progress-strip .fill{height:100%; background:var(--mh-primary); border-radius:999px; transition:width .25s ease-out; width:0%;}
+  .progress-strip .label{font-size:12px; font-weight:600; color:var(--mh-fg-3); white-space:nowrap;}
+
+  .footnote{padding:18px 40px 28px; font-size:11px; color:var(--mh-fg-4); line-height:18px;}
+
+  /* ---- top nav (shared across every page) ---- */
+  .mh-nav{position:sticky; top:0; z-index:40; background:#FFFFFF; border-bottom:1px solid #EEEEEE;}
+  .mh-nav-inner{max-width:1200px; margin:0 auto; padding:0 24px; height:60px; display:flex; align-items:center; gap:24px;}
+  .mh-nav-logo{display:flex; align-items:center; gap:8px; text-decoration:none; flex:0 0 auto;}
+  .mh-nav-logo img{height:20px; width:auto; display:block;}
+  .mh-nav-logo span{font-size:13px; font-weight:700; color:var(--mh-fg); letter-spacing:-0.01em; white-space:nowrap;}
+  .mh-nav-logo:hover{text-decoration:none;}
+  .mh-nav-links{display:flex; align-items:center; gap:4px; flex:1; overflow-x:auto;}
+  .mh-nav-link{display:inline-flex; align-items:center; height:34px; padding:0 14px; border-radius:8px; font-size:13px; font-weight:600; color:var(--mh-fg-3); text-decoration:none; white-space:nowrap; transition:all .15s ease-out;}
+  .mh-nav-link:hover{background:#F7F8F9; color:var(--mh-fg); text-decoration:none;}
+  .mh-nav-link.active{background:var(--mh-primary-tint); color:var(--mh-primary); font-weight:700;}
+</style>
+</head>
+<body>
+<div class="mh-nav">
+  <div class="mh-nav-inner">
+    <a class="mh-nav-logo" href="index.html">
+      <img src="assets/matholic_logo.png" alt="MATHOLIC">
+      <span>AI 서술형채점</span>
+    </a>
+    <nav class="mh-nav-links">
+      <a class="mh-nav-link active" href="index.html">홈</a>
+      <a class="mh-nav-link" href="tutorial-1.html">Ⅰ. 학습지 출제</a>
+      <a class="mh-nav-link" href="tutorial-2.html">Ⅱ. OMR답안지 출력</a>
+      <a class="mh-nav-link" href="tutorial-3.html">Ⅲ. AI 채점 확인</a>
+    </nav>
+  </div>
+</div>
+<div class="page">
+  <div class="panel">
+
+    <div class="hero">
+      <div class="badge-row">
+        <span class="badge-new">NEW</span>
+        <span class="badge-label">AI 서술형 첨삭 · 튜토리얼</span>
+      </div>
+      <h1>학생 풀이과정을 올리기만 하면,<br><em>AI가 채점하고 첨삭까지</em> 끝냅니다</h1>
+      <p class="lead">
+        서술형 문제는 학생 한 명 한 명의 풀이과정을 선생님이 직접 읽고 채점해야 해서 늘 부담스러웠습니다.
+        AI 서술형채점은 실제 학교 시험에 자주 나오는 빈출 문항으로 학습지를 출제하고, OMR 답안지로 실전처럼 제출하게 한 뒤,
+        AI가 단계별로 채점하고 첨삭까지 자동으로 완성합니다. 아래 3단계로 전체 흐름을 직접 체험해보세요.
+      </p>
+    </div>
+
+    <div class="section" style="border-bottom:none; padding-bottom:20px;">
+      <h2>튜토리얼 시작하기</h2>
+      <p class="sub">순서대로 진행하는 것을 추천하지만, 원하는 단계부터 바로 볼 수도 있습니다.</p>
+      <div class="menu-grid">
+
+        <div class="menu-card">
+          <div class="menu-top">
+            <div class="roman">Ⅰ</div>
+            <span class="done-pill" data-done="t1">✓ 완료</span>
+          </div>
+          <h3>서술형 학습지 출제</h3>
+          <p>학교의 서술형 문제를 대비하기 위한 학습지를, 내신 빈출 문항으로 몇 번의 클릭만에 만드는 과정을 안내합니다.</p>
+          <a class="menu-cta" href="tutorial-1.html">시작하기 →</a>
+        </div>
+
+        <div class="menu-card">
+          <div class="menu-top">
+            <div class="roman">Ⅱ</div>
+            <span class="done-pill" data-done="t2">✓ 완료</span>
+          </div>
+          <h3>OMR답안지 출력</h3>
+          <p>시험 대비 실전 감각을 키우기 위해, 서술형 답안 영역을 조정한 OMR 답안지를 출력하는 방법을 안내합니다.</p>
+          <a class="menu-cta" href="tutorial-2.html">시작하기 →</a>
+        </div>
+
+        <div class="menu-card">
+          <div class="menu-top">
+            <div class="roman">Ⅲ</div>
+            <span class="done-pill" data-done="t3">✓ 완료</span>
+          </div>
+          <h3>OMR 답안 입력 &amp; AI 채점 확인</h3>
+          <p>학생이 제출한 답안을 업로드하고, AI가 풀이과정을 단계별로 채점·첨삭하는 결과를 직접 확인합니다.</p>
+          <a class="menu-cta" href="tutorial-3.html">시작하기 →</a>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="progress-strip">
+      <span class="label">튜토리얼 진행률</span>
+      <div class="track"><div class="fill" id="progressFill"></div></div>
+      <span class="label" id="progressLabel">0 / 3 완료</span>
+    </div>
+
+    <div class="section">
+      <h2>왜 AI 서술형채점인가요</h2>
+      <p class="sub">수학 학원 대상 서술형·채점 서비스들과 비교했을 때, AI 서술형채점만의 차이입니다.</p>
+      <div class="diff-grid">
+
+        <div class="diff-card">
+          <span class="tag">문항 콘텐츠형 서비스</span>
+          <h3>콘텐츠만 주고, 채점은 여전히 선생님 몫</h3>
+          <p>서술형 문항과 단계별 채점 기준표는 제공하지만, 실제 채점과 첨삭은 선생님이 기준표를 보며 직접 진행해야 합니다.</p>
+        </div>
+
+        <div class="diff-card">
+          <span class="tag">학생용 자기주도 앱</span>
+          <h3>학원 수업이 아닌, 개인 자습 중심</h3>
+          <p>사진으로 찍은 개인 풀이를 AI가 줄 단위로 첨삭해주지만, 학원 선생님의 학습지 출제·시험 관리 흐름과는 분리되어 있습니다.</p>
+        </div>
+
+        <div class="diff-card ours">
+          <span class="tag">AI 서술형채점</span>
+          <h3>출제부터 실전 훈련, 채점까지 한 번에</h3>
+          <p>내신 빈출 문항 출제 → OMR 답안지로 실전처럼 제출 → AI가 단계별 배점과 오류 유형(계산 실수·개념 부족·논리 오류)까지 자동 분석. 선생님은 결과만 확인하면 됩니다.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="footnote">
+      매쓰홀릭 AI 서술형채점 · 학습지 출제부터 AI 채점까지, 학교 시험 실전 감각을 그대로 옮겨온 튜토리얼입니다.
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  var KEY = 'mh-ai-grading-tutorial-progress';
+  function readProgress() {
+    try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { return {}; }
+  }
+  var progress = readProgress();
+  var ids = ['t1', 't2', 't3'];
+  var doneCount = 0;
+  ids.forEach(function (id) {
+    if (progress[id]) {
+      doneCount++;
+      var pill = document.querySelector('.done-pill[data-done="' + id + '"]');
+      if (pill) pill.classList.add('show');
+    }
+  });
+  var pct = Math.round((doneCount / ids.length) * 100);
+  var fill = document.getElementById('progressFill');
+  var label = document.getElementById('progressLabel');
+  if (fill) fill.style.width = pct + '%';
+  if (label) label.textContent = doneCount + ' / 3 완료';
+})();
+</script>
+</body>
+</html>

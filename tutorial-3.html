@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/matholic-design-system-e6d31222-91d3-47b9-aebe-84a65a8b8cf0/fonts/suit.css">
+<link rel="stylesheet" href="_ds/matholic-design-system-e6d31222-91d3-47b9-aebe-84a65a8b8cf0/fonts/jetbrains-mono.css">
+<link rel="stylesheet" href="_ds/matholic-design-system-e6d31222-91d3-47b9-aebe-84a65a8b8cf0/colors_and_type.css">
+<link rel="stylesheet" href="_ds/matholic-design-system-e6d31222-91d3-47b9-aebe-84a65a8b8cf0/styles.css">
+<script src="_ds/matholic-design-system-e6d31222-91d3-47b9-aebe-84a65a8b8cf0/_ds_bundle.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #EFF1F4; }
+  a { color: #4A3EE0; text-decoration: none; }
+  a:hover { color: #372FA0; text-decoration: underline; }
+  @keyframes mhFade { from { opacity: 0; } to { opacity: 1; } }
+  .mh-nav{position:sticky; top:0; z-index:40; background:#FFFFFF; border-bottom:1px solid #EEEEEE;}
+  .mh-nav-inner{max-width:1200px; margin:0 auto; padding:0 24px; height:60px; display:flex; align-items:center; gap:24px;}
+  .mh-nav-logo{display:flex; align-items:center; gap:8px; text-decoration:none; flex:0 0 auto;}
+  .mh-nav-logo img{height:20px; width:auto; display:block;}
+  .mh-nav-logo span{font-size:13px; font-weight:700; color:#212121; letter-spacing:-0.01em; white-space:nowrap;}
+  .mh-nav-links{display:flex; align-items:center; gap:4px; flex:1; overflow-x:auto;}
+  .mh-nav-link{display:inline-flex; align-items:center; height:34px; padding:0 14px; border-radius:8px; font-size:13px; font-weight:600; color:#777777; text-decoration:none; white-space:nowrap; transition:all .15s ease-out;}
+  .mh-nav-link:hover{background:#F7F8F9; color:#212121; text-decoration:none;}
+  .mh-nav-link.active{background:#EFEEFE; color:#6155F5; font-weight:700;}
+</style>
+</helmet>
+<div class="mh-nav">
+  <div class="mh-nav-inner">
+    <a class="mh-nav-logo" href="index.html">
+      <img src="assets/matholic_logo.png" alt="MATHOLIC">
+      <span>AI 서술형채점</span>
+    </a>
+    <nav class="mh-nav-links">
+      <a class="mh-nav-link" href="index.html">홈</a>
+      <a class="mh-nav-link" href="tutorial-1.html">Ⅰ. 학습지 출제</a>
+      <a class="mh-nav-link" href="tutorial-2.html">Ⅱ. OMR답안지 출력</a>
+      <a class="mh-nav-link active" href="tutorial-3.html">Ⅲ. AI 채점 확인</a>
+    </nav>
+  </div>
+</div>
+<div style="min-height:100vh; display:flex; flex-direction:column; gap:16px; padding:24px; background:#EFF1F4; font-family:var(--mh-font); letter-spacing:-0.005em">
+
+  <div style="display:flex; align-items:flex-end; gap:24px; flex-wrap:wrap">
+    <div style="display:flex; flex-direction:column; gap:8px; flex:1; min-width:0">
+      <h1 style="font:700 24px/100% var(--mh-font); color:#212121">OMR 답안 입력하기</h1>
+      <p style="font:400 14px/22px var(--mh-font); color:#555; text-wrap:pretty">학생이 학습한 답안지를 매쓰홀릭 프리미엄에 업로드합니다.</p>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:8px; width:240px">
+      <div style="display:flex; justify-content:space-between; align-items:baseline; font:600 13px/1 var(--mh-font); color:#212121">
+        <span>{{ chapterName }}</span>
+        <span style="color:#999">{{ subLabel }}</span>
+      </div>
+      <div style="height:4px; border-radius:999px; background:#D9D9D9; overflow:hidden">
+        <div style="height:100%; background:#6155F5; border-radius:999px; transition:width .2s ease-out; width:{{ pct }}"></div>
+      </div>
+      <div style="font:400 12px/16px var(--mh-font); color:#777">{{ stepName }}</div>
+    </div>
+  </div>
+
+  <div style="display:flex; flex-direction:column; gap:12px; padding:14px 16px; background:#fff; border:1px solid #D9D9D9; border-radius:10px">
+    <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap">
+      <div style="display:flex; flex-wrap:wrap; gap:12px; flex:1; min-width:0">
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+          <button type="button" onClick="{{ t.go }}" style="display:inline-flex; align-items:center; gap:8px; height:36px; padding:0 16px; border-radius:6px; cursor:pointer; white-space:nowrap; flex:none; font:{{ t.font }}; background:{{ t.bg }}; color:{{ t.fg }}; border:1px solid {{ t.border }}" style-hover="background:#F7F8F9">
+            <span style="display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:999px; font:600 11px/1 var(--mh-font); background:{{ t.numBg }}; color:{{ t.numFg }}">{{ t.no }}</span>
+            {{ t.name }}
+          </button>
+        </sc-for>
+      </div>
+      <div style="display:flex; flex:none; border:1px solid #D9D9D9; border-radius:6px; overflow:hidden">
+        <button type="button" onClick="{{ setTutorial }}" style="height:34px; padding:0 14px; border:none; cursor:pointer; white-space:nowrap; font:{{ tutFont }}; background:{{ tutBg }}; color:{{ tutFg }}">튜토리얼</button>
+        <button type="button" onClick="{{ setAuto }}" style="height:34px; padding:0 14px; border:none; border-left:1px solid #D9D9D9; cursor:pointer; white-space:nowrap; font:{{ autoFont }}; background:{{ autoBg }}; color:{{ autoFg }}">자동재생</button>
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px">
+      <sc-for list="{{ dots }}" as="d" hint-placeholder-count="4">
+        <button type="button" onClick="{{ d.go }}" title="{{ d.name }}" style="border:none; cursor:pointer; padding:0; height:6px; border-radius:999px; transition:width .2s ease-out, background .15s ease-out; width:{{ d.w }}; background:{{ d.bg }}"></button>
+      </sc-for>
+    </div>
+  </div>
+
+  <sc-if value="{{ tipOutside }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex; flex-direction:column; gap:10px; padding:16px 20px; background:#fff; border:1px solid #4A3EE0; border-radius:10px; animation:mhFade .2s ease-out">
+      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap">
+        <span style="display:inline-flex; align-items:center; height:22px; padding:0 8px; border-radius:4px; background:#4A3EE0; color:#fff; font:600 12px/1 var(--mh-font)">{{ tag }}</span>
+        <span style="font:400 12px/16px var(--mh-font); color:#777">{{ tagNote }}</span>
+        <span style="font:700 15px/140% var(--mh-font); color:#212121">{{ stepName }}</span>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:8px 24px">
+        <sc-for list="{{ body }}" as="line" hint-placeholder-count="2">
+          <p style="font:400 13px/20px var(--mh-font); color:#555; text-wrap:pretty">{{ line }}</p>
+        </sc-for>
+      </div>
+      <sc-if value="{{ hasPapers }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex; flex-wrap:wrap; gap:28px">
+          <div style="display:flex; flex-direction:column; gap:8px; flex:none">
+            <div style="font:400 13px/20px var(--mh-font); color:#555">출력했던 답안용지를 스캔합니다.</div>
+            <div style="width:190px; height:23px; background-image:url('uploads/t3/image 52.png'); background-size:190px auto; background-position:0 0; background-repeat:no-repeat"></div>
+            <div style="width:210px; aspect-ratio:958 / 1355; border:1px solid #EEEEEE; border-radius:4px; background-image:url('uploads/t3/image 46.png'); background-size:100% 100%; background-repeat:no-repeat; background-color:#fff"></div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:8px; flex:none">
+            <div style="font:400 13px/20px var(--mh-font); color:#555">출력했던 OMR답안을 스캔합니다.</div>
+            <div style="width:190px; height:23px; background-image:url('uploads/t3/image 52.png'); background-size:190px auto; background-position:0 100%; background-repeat:no-repeat"></div>
+            <div style="width:210px; aspect-ratio:904 / 1278; border:1px solid #EEEEEE; border-radius:4px; background-image:url('uploads/t3/image 48.png'); background-size:100% 100%; background-repeat:no-repeat; background-color:#fff"></div>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ hasHint }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:10px 12px; border-radius:6px; background:#F7F8F9; border:1px solid #EEEEEE; font:400 12px/18px var(--mh-font); color:#555">{{ hint }}</div>
+      </sc-if>
+      <div style="display:flex; align-items:center; gap:8px">
+        <x-import component-from-global-scope="MatholicDesignSystem_e6d312.Button" variant="ghost" size="sm" on-click="{{ prev }}" hint-size="auto,28px">뒤로</x-import>
+        <x-import component-from-global-scope="MatholicDesignSystem_e6d312.Button" size="sm" on-click="{{ next }}" dc-props="{{ nextProps }}" hint-size="auto,28px">{{ nextLabel }}</x-import>
+        <span style="margin-left:auto; font:400 11px/14px var(--mh-font); color:#999">{{ counter }}</span>
+      </div>
+    </div>
+  </sc-if>
+
+  <div style="background:#fff; border:1px solid #D9D9D9; border-radius:10px; padding:12px; min-width:0">
+
+    <sc-if value="{{ isSingle }}" hint-placeholder-val="{{ true }}">
+      <div onClick="{{ next }}" title="화면을 선택하면 다음으로 이동합니다" style="position:relative; border:1px solid #EEEEEE; border-radius:6px; overflow:hidden; cursor:pointer; background:#fff; aspect-ratio:{{ ratio }}; transition:opacity .26s ease-out, transform .26s ease-out; opacity:{{ fadeOpacity }}; transform:{{ fadeShift }}">
+        <div style="position:absolute; left:0; right:0; height:100%; top:{{ imgShift }}; background-image:{{ imgBg }}; background-size:100% 100%; background-repeat:no-repeat"></div>
+        <sc-if value="{{ hasMask }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute; left:8.6%; top:1.7%; width:3.3%; height:5.3%; background:{{ maskFill }}"></div>
+        </sc-if>
+        <sc-if value="{{ spot }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute; inset:0; background:rgba(18,24,20,0.62)"></div>
+        </sc-if>
+        <sc-for list="{{ windows }}" as="w">
+          <div style="position:absolute; overflow:hidden; border-radius:6px; top:{{ w.top }}; left:{{ w.left }}; width:{{ w.w }}; height:{{ w.h }}">
+            <div style="position:absolute; background-image:{{ imgBg }}; background-size:100% 100%; background-repeat:no-repeat; width:{{ w.iw }}; height:{{ w.ih }}; left:{{ w.il }}; top:{{ w.it }}"></div>
+          </div>
+        </sc-for>
+        <sc-for list="{{ marks }}" as="m">
+          <div style="position:absolute; pointer-events:none; border:2px solid #6155F5; border-radius:8px; top:{{ m.top }}; left:{{ m.left }}; width:{{ m.w }}; height:{{ m.h }}; box-shadow:0 0 0 1px #4A3EE0, 0 0 0 4px rgba(97,85,245,0.30)"></div>
+        </sc-for>
+
+        <sc-if value="{{ hasChev }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute; z-index:7; display:flex; align-items:center; gap:10px; top:{{ chevTop }}; left:{{ chevLeft }}; transform:translate(-100%, -50%)">
+            <span style="display:inline-flex; align-items:center; height:26px; padding:0 10px; border-radius:6px; background:#4A3EE0; color:#fff; font:600 12px/1 var(--mh-font); white-space:nowrap">다음문제로 이동</span>
+            <span style="display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:8px; background:#fff; border:2px solid #6155F5; box-shadow:0 0 0 4px rgba(97,85,245,0.30); color:#6155F5">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"></path></svg>
+            </span>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ tipInside }}" hint-placeholder-val="{{ true }}">
+          <div onClick="{{ stop }}" style="position:absolute; z-index:6; display:flex; flex-direction:column; gap:12px; cursor:default; width:{{ tipWidth }}; left:{{ tipLeft }}; right:{{ tipRight }}; top:{{ tipTop }}; bottom:{{ tipBottom }}">
+          <sc-if value="{{ hasPapers }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; flex-wrap:wrap; gap:20px; padding:12px 14px; background:#fff; border:1px solid #D9D9D9; border-radius:10px; box-shadow:0 6px 16px rgba(0,35,11,0.2)">
+              <div style="display:flex; flex-direction:column; gap:6px; flex:none">
+                <div style="font:400 12px/18px var(--mh-font); color:#555">출력했던 답안용지를 스캔합니다.</div>
+                <div style="width:150px; height:19px; background-image:url('uploads/t3/image 52.png'); background-size:150px auto; background-position:0 0; background-repeat:no-repeat"></div>
+                <button type="button" onClick="{{ zoomPaper }}" title="크게 보기" style="position:relative; padding:0; width:56px; aspect-ratio:958 / 1355; border:1px solid #EEEEEE; border-radius:4px; cursor:zoom-in; background-image:url('uploads/t3/image 46.png'); background-size:100% 100%; background-repeat:no-repeat; background-color:#fff">
+                  <span style="position:absolute; right:-8px; bottom:-8px; display:flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:999px; background:#4A3EE0; color:#fff; box-shadow:0 2px 6px rgba(0,0,0,0.2)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path><path d="M11 8v6"></path><path d="M8 11h6"></path></svg>
+                  </span>
+                </button>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:6px; flex:none">
+                <div style="font:400 12px/18px var(--mh-font); color:#555">출력했던 OMR답안을 스캔합니다.</div>
+                <div style="width:150px; height:19px; background-image:url('uploads/t3/image 52.png'); background-size:150px auto; background-position:0 100%; background-repeat:no-repeat"></div>
+                <button type="button" onClick="{{ zoomOmr }}" title="크게 보기" style="position:relative; padding:0; width:56px; aspect-ratio:904 / 1278; border:1px solid #EEEEEE; border-radius:4px; cursor:zoom-in; background-image:url('uploads/t3/image 48.png'); background-size:100% 100%; background-repeat:no-repeat; background-color:#fff">
+                  <span style="position:absolute; right:-8px; bottom:-8px; display:flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:999px; background:#4A3EE0; color:#fff; box-shadow:0 2px 6px rgba(0,0,0,0.2)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path><path d="M11 8v6"></path><path d="M8 11h6"></path></svg>
+                  </span>
+                </button>
+              </div>
+            </div>
+          </sc-if>
+          <div style="background:#fff; border:1px solid #4A3EE0; border-radius:10px; box-shadow:0 6px 16px rgba(0,35,11,0.2); padding:14px 16px; display:flex; flex-direction:column; gap:10px">
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap">
+              <span style="display:inline-flex; align-items:center; height:22px; padding:0 8px; border-radius:4px; background:#4A3EE0; color:#fff; font:600 12px/1 var(--mh-font)">{{ tag }}</span>
+              <span style="font:400 12px/16px var(--mh-font); color:#777">{{ tagNote }}</span>
+            </div>
+            <div style="font:700 15px/140% var(--mh-font); color:#212121; text-wrap:pretty">{{ stepName }}</div>
+            <div style="display:flex; flex-direction:column; gap:6px">
+              <sc-for list="{{ body }}" as="line" hint-placeholder-count="2">
+                <p style="font:400 13px/20px var(--mh-font); color:#555; text-wrap:pretty">{{ line }}</p>
+              </sc-for>
+            </div>
+
+            <sc-if value="{{ hasHint }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:8px 10px; border-radius:6px; background:#F7F8F9; border:1px solid #EEEEEE; font:400 12px/18px var(--mh-font); color:#555">{{ hint }}</div>
+            </sc-if>
+            <div style="display:flex; align-items:center; gap:8px">
+              <x-import component-from-global-scope="MatholicDesignSystem_e6d312.Button" variant="ghost" size="sm" on-click="{{ prev }}" disabled="{{ atStart }}" hint-size="auto,28px">뒤로</x-import>
+              <x-import component-from-global-scope="MatholicDesignSystem_e6d312.Button" size="sm" on-click="{{ next }}" dc-props="{{ nextProps }}" hint-size="auto,28px">{{ nextLabel }}</x-import>
+              <span style="margin-left:auto; font:400 11px/14px var(--mh-font); color:#999">{{ counter }}</span>
+            </div>
+          </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ zoomOpen }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ closeZoom }}" style="position:absolute; inset:0; z-index:20; display:flex; align-items:center; justify-content:center; background:rgba(18,24,20,0.78); cursor:zoom-out; animation:mhFade .18s ease-out">
+            <div style="height:92%; aspect-ratio:{{ zoomRatio }}; border-radius:6px; background-image:{{ zoomBg }}; background-size:100% 100%; background-repeat:no-repeat; background-color:#fff; box-shadow:0 12px 32px rgba(0,0,0,0.4)"></div>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isTablet }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ next }}" title="화면을 선택하면 다음으로 이동합니다" style="position:relative; border:1px solid #EEEEEE; border-radius:6px; overflow:hidden; cursor:pointer; animation:mhFade .2s ease-out; background:#F7F8F9; aspect-ratio:2881 / 1532; background-image:{{ tabletBg }}; background-size:100% 100%; background-repeat:no-repeat">
+        <div style="position:absolute; pointer-events:none; border:2px solid #6155F5; border-radius:8px; left:44%; top:20.3%; width:12%; height:6.4%; box-shadow:0 0 0 1px #4A3EE0, 0 0 0 4px rgba(97,85,245,0.30)"></div>
+
+        <sc-if value="{{ videoLive }}" hint-placeholder-val="{{ true }}">
+          <div onClick="{{ stop }}" style="position:absolute; right:3%; bottom:5%; width:36%; padding:1.2%; border-radius:18px; background:#141414; box-shadow:0 10px 24px rgba(0,0,0,0.28); cursor:default">
+            <video src="{{ videoSrc }}" ref="{{ videoRef }}" onEnded="{{ onVideoEnd }}" onPlay="{{ onVideoPlay }}" onClick="{{ togglePlay }}" playsinline style="display:block; width:100%; aspect-ratio:1280 / 720; border-radius:8px; background:#fff; cursor:pointer"></video>
+            <sc-if value="{{ showPlay }}" hint-placeholder-val="{{ true }}">
+              <button type="button" onClick="{{ playVideo }}" style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; border:none; cursor:pointer; background:rgba(24,32,28,0.45); border-radius:18px">
+                <span style="display:flex; align-items:center; justify-content:center; width:48px; height:48px; border-radius:999px; background:#4A3EE0; color:#fff">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"></path></svg>
+                </span>
+              </button>
+            </sc-if>
+          </div>
+        </sc-if>
+        <sc-if value="{{ videoEnded }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ stop }}" style="position:absolute; right:3%; bottom:4%; width:52%; background:#fff; border:1px solid #4A3EE0; border-radius:10px; box-shadow:0 6px 16px rgba(0,35,11,0.2); padding:12px 14px; cursor:default; display:flex; gap:14px; animation:mhFade .2s ease-out">
+            <div style="height:150px; aspect-ratio:891 / 691; flex:none; border:1px solid #EEEEEE; border-radius:6px; background-image:url('uploads/t3/여러학생.png'); background-size:100% 100%; background-repeat:no-repeat; background-color:#fff"></div>
+            <div style="display:flex; flex-direction:column; gap:8px; min-width:0; flex:1">
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap">
+              <span style="display:inline-flex; align-items:center; height:22px; padding:0 8px; border-radius:4px; background:#4A3EE0; color:#fff; font:600 12px/1 var(--mh-font)">TIP</span>
+              <span style="font:700 14px/140% var(--mh-font); color:#212121; word-break:keep-all">여러 명 동시 등록</span>
+            </div>
+            <p style="font:400 13px/20px var(--mh-font); color:#555; text-wrap:pretty">서로 다른 시험지를 여러 명으로도 한번에 등록할 수 있습니다.</p>
+            <div style="display:flex; align-items:center; gap:8px; margin-top:auto">
+              <button type="button" onClick="{{ replay }}" style="display:inline-flex; align-items:center; gap:6px; height:28px; padding:0 12px; border:1px solid #D9D9D9; border-radius:6px; background:#fff; color:#555; cursor:pointer; font:500 12px/1 var(--mh-font)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5"></path></svg>
+                영상 다시보기
+              </button>
+            </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <div onClick="{{ stop }}" style="position:absolute; z-index:6; left:3%; top:47%; width:min(360px, 32%); background:#fff; border:1px solid #4A3EE0; border-radius:10px; box-shadow:0 6px 16px rgba(0,35,11,0.2); padding:14px 16px; cursor:default; display:flex; flex-direction:column; gap:10px">
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap">
+            <span style="display:inline-flex; align-items:center; height:22px; padding:0 8px; border-radius:4px; background:#4A3EE0; color:#fff; font:600 12px/1 var(--mh-font)">{{ tag }}</span>
+            <span style="font:400 12px/16px var(--mh-font); color:#777">{{ tagNote }}</span>
+          </div>
+          <div style="font:700 15px/140% var(--mh-font); color:#212121">{{ tabletTitle }}</div>
+          <div style="display:flex; flex-direction:column; gap:6px">
+            <sc-for list="{{ tabletBody }}" as="line" hint-placeholder-count="2">
+              <p style="font:400 13px/20px var(--mh-font); color:#555; text-wrap:pretty">{{ line }}</p>
+            </sc-for>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px">
+            <x-import component-from-global-scope="MatholicDesignSystem_e6d312.Button" variant="ghost" size="sm" on-click="{{ prev }}" hint-size="auto,28px">뒤로</x-import>
+            <x-import component-from-global-scope="MatholicDesignSystem_e6d312.Button" size="sm" on-click="{{ next }}" dc-props="{{ nextProps }}" hint-size="auto,28px">{{ nextLabel }}</x-import>
+            <span style="margin-left:auto; font:400 11px/14px var(--mh-font); color:#999">{{ counter }}</span>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+  </div>
+
+  <sc-if value="{{ showComplete }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center; background:rgba(20,18,43,0.55); padding:20px; box-sizing:border-box">
+      <div style="width:100%; max-width:420px; background:#fff; border-radius:16px; box-shadow:0 20px 60px rgba(30,24,90,0.35); padding:32px 28px 24px; box-sizing:border-box; display:flex; flex-direction:column; gap:16px; text-align:center">
+        <div style="width:56px; height:56px; margin:0 auto; border-radius:999px; background:#EFEEFE; display:flex; align-items:center; justify-content:center">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6155F5" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg>
+        </div>
+        <div>
+          <h2 style="margin:0 0 6px; font:700 19px/130% var(--mh-font); color:#212121; letter-spacing:-0.01em">Ⅲ. OMR 답안 입력 &amp; AI 채점, 튜토리얼을 모두 마쳤어요</h2>
+          <p style="margin:0; font:400 14px/22px var(--mh-font); color:#555">이제 실제 학습지를 만들어 AI 서술형 첨삭을 학생들과 함께 사용해 보세요.</p>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:10px; margin-top:8px">
+          <button type="button" onClick="{{ goHome }}" style="height:44px; border-radius:8px; border:1px solid #6155F5; background:#6155F5; color:#fff; font-family:inherit; font-size:14px; font-weight:700; cursor:pointer">튜토리얼 홈으로 돌아가기</button>
+          <button type="button" onClick="{{ markComplete }}" style="height:40px; border-radius:8px; border:1px solid #6155F5; background:{{ markCompleteBg }}; color:#6155F5; font-family:inherit; font-size:13px; font-weight:600; cursor:pointer">{{ markCompleteLabel }}</button>
+          <button type="button" onClick="{{ closeComplete }}" style="height:32px; border:none; background:transparent; color:#999; font-family:inherit; font-size:12px; cursor:pointer">닫고 계속 둘러보기</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+const IMG = n => encodeURI('uploads/t3/image ' + n + '.png');
+const ACCENT = '#6155F5';
+const ACCENT_LINE = '#4A3EE0';
+const ACCENT_TEXT = '#4A3EE0';
+const ACCENT_TINT = '#EFEEFE';
+
+const CHAPTERS = [
+  { name: 'OMR답안 입력', steps: [
+    { tag: '1', note: 'OMR답안 입력', name: '답안입력 화면으로 이동',
+      body: ['우측 상단의 답안입력 아이콘을 클릭하여 답안입력 화면으로 이동합니다.'],
+      papers: true, nextLabel: '답안용지 스캔하기',
+      img: '1', size: [2308, 1329], spot: true,
+      marks: [['1.2%', '91.3%', '5.5%', '11.5%'], ['9.3%', '61.8%', '12.2%', '7.2%'], ['9.3%', '74.6%', '13%', '7.2%']],
+      tip: { top: '17.5%', left: '52%', width: 'min(520px, 46%)' } },
+
+    { tag: '참고', note: '답안용지 스캔하기', name: '[답안용지 스캔하기] 선택',
+      body: ['OMR답안 스캔하기 왼쪽의 [답안용지 스캔하기]를 선택합니다.'],
+      nextLabel: 'AR 답안입력 열기',
+      img: 16, mask: true, spot: true,
+      marks: [['8.5%', '59.8%', '12.5%', '6%']],
+      tip: { top: '22%', left: '46%' } },
+
+    { tag: '참고', note: '답안용지 스캔하기', name: 'AR 답안입력 창',
+      body: ['[답안용지 스캔하기]를 선택하면 AR 답안입력 창이 열립니다.', '답안 작성 용지의 QR코드와 마커가 모두 보이게 촬영하여 한번에 답안입력합니다.'],
+      hint: '[시작하기]를 선택하면 촬영이 시작됩니다.',
+      nextLabel: 'OMR답안 스캔하기',
+      img: 17, shift: 20, tip: { bottom: '3%', left: '4%', width: 'min(620px, 66%)' } },
+
+    { tag: '1-1 · 1-2 · 1-3', note: '업로드 방식', name: '업로드 방식 선택',
+      body: ['세 가지 방식 중 편한 방식으로 업로드합니다.', '① 파일 업로드 : 기기에 저장된 파일을 드래그 앤 드랍으로 업로드합니다.', '② 모바일 업로드 : 휴대폰 · 태블릿으로 답안 작성 용지를 스캔할 수 있는 페이지로 이동합니다.', '③ 클라우드 업로드 : 연동된 클라우드의 파일을 드래그 앤 드랍으로 업로드합니다.'],
+      nextLabel: '모바일 업로드', nextLight: true,
+      img: '2', mask: true, spot: true,
+      marks: [['9.5%', '72.3%', '13.7%', '18.5%']],
+      tip: { top: '30%', left: '52%' } }
+  ] },
+
+  { name: '모바일업로드', steps: [
+    { tag: 'ⓐ', note: '모바일 업로드', name: 'OMR답안 스캔 QR코드 팝업',
+      body: ['휴대폰으로 QR코드를 스캔하면 답안 작성 용지를 촬영할 수 있는 페이지로 이동합니다.', '스캔된 결과는 이 창으로 자동 전송됩니다.'],
+      img: 19,
+      marks: [['19%', '44.3%', '11.8%', '21.5%']],
+      tip: { top: '6%', right: '3%' } },
+
+    { tag: 'ⓑ', note: '모바일 업로드', name: '휴대폰 연결됨', kind: 'tablet',
+      body: ['휴대폰이 연결되면 상태가 [휴대폰 연결됨]으로 바뀝니다.', '연결된 태블릿 · 휴대폰으로 답안 작성 용지를 촬영합니다.'],
+      doneName: 'PC로 전송 완료',
+      doneBody: ['모바일에서 전송이 완료되면 PC 화면의 [답안 입력 대기 중] 목록에 학습지가 나타납니다.', '학습지 확인 후 [답안 입력하기]를 선택합니다.'] },
+
+  ] },
+
+  { name: 'AI서술형첨삭', outsideTip: true, steps: [
+    { tag: '2', note: '답안 확인', name: '학생별 답안 이미지 확인',
+      body: ['학생별 답안 이미지를 확인하며 채점을 진행합니다.', '[답안 이미지] 탭에서 인식된 OMR 이미지와 원본 답안을 나란히 확인할 수 있습니다.'],
+      body: ['학생별 답안 이미지를 확인하며 채점을 진행합니다.', '[답안 이미지] 탭에서 인식된 OMR 이미지와 원본 답안을 나란히 확인할 수 있습니다.', '우측 [ > ] 버튼을 선택해 다음 문제로 이동합니다.'],
+      img: 27, mask: true, spot: true,
+      marks: [['26.8%', '9.3%', '77.5%', '67.5%'], ['40.5%', '30.2%', '6%', '5.5%'], ['46%', '13.8%', '13%', '24%']],
+      chev: ['70%', '86%'] },
+
+    { tag: '3', note: '서술형 채점', name: '[AI풀이채점] 선택',
+      body: ['학생의 서술형 풀이를 확인하며 [AI풀이채점]을 선택합니다.'],
+      img: 29, mask: true, spot: true,
+      windows: [['26.8%', '9.3%', '77.5%', '67.5%']],
+      marks: [['61%', '53.3%', '8%', '5.5%']] },
+
+    { tag: '4', note: 'AI 채점 결과', name: 'AI 풀이 점수 · 단계별 첨삭',
+      body: ['AI가 학생의 풀이 과정을 분석하여 풀이 점수를 부여합니다.', 'AI의 단계적인 채점과 첨삭을 통해 선생님의 지도가 쉬워집니다.'],
+      img: 30, mask: true, spot: true,
+      windows: [['26.8%', '9.3%', '77.5%', '67.5%']], marks: [] },
+
+    { tag: '4', note: 'AI 채점 결과', name: '다음 문항도 같은 방식으로 채점',
+      body: ['다음 문항의 서술형 풀이도 AI풀이채점으로 채점합니다. 단계별 풀이과정을 분석하여 배점과 틀린 이유(계산 실수 · 개념 부족 · 논리 오류 등)가 함께 표시됩니다.', '선생님이 직접 채점하고 첨삭할 필요 없이 AI가 자동으로 도와줍니다.'],
+      img: '35-593df822', mask: true, spot: true,
+      windows: [['26.8%', '9.3%', '77.5%', '67.5%']], marks: [] },
+
+    { tag: '4', note: '제출', name: '[일괄제출] 선택',
+      body: ['모든 서술형 답안을 확인한 후 [일괄제출]을 선택합니다.'],
+      img: 37, mask: true, spot: true,
+      windows: [['26.8%', '9.3%', '77.5%', '67.5%'], ['94.6%', '80.8%', '7%', '5%']],
+      marks: [['94.6%', '80.8%', '7%', '5%']] }
+  ] },
+
+  { name: 'AI서술형첨삭 확인', steps: [
+    { tag: '4', note: '채점 메뉴', name: '[채점] 메뉴에서 다시 확인',
+      body: ['학생의 AI서술형첨삭은 채점 메뉴에서 확인이 가능합니다.', '해당 학습지의 채점 메뉴로 돌아오면 답안의 반짝이 아이콘을 선택하여 AI풀이첨삭을 다시 확인할 수 있습니다.'],
+      img: 40, marks: [['34%', '18%', '4.5%', '7%']],
+      tip: { bottom: '3.5%', right: '2.5%' } },
+
+    { tag: '5', note: '전체 확인', name: '문항별 풀이내용 및 AI풀이첨삭',
+      body: ['서술형 문항별 풀이내용 및 AI풀이첨삭을 모두 확인할 수 있습니다.', '[한명씩 보기]를 켜면 학생 한 명의 전체 문항을 한 줄로 훑어볼 수 있습니다.'],
+      img: 41, marks: [['16.5%', '38.5%', '33%', '5.5%']],
+      tip: { bottom: '3.5%', right: '2.5%' } }
+  ] }
+];
+
+const FLAT = [];
+CHAPTERS.forEach((c, ci) => c.steps.forEach((s, si) => FLAT.push(Object.assign({}, s, {
+  ci, si, chapter: c.name, subTotal: c.steps.length, outsideTip: !!c.outsideTip || !!s.outsideTip
+}))));
+
+const num = v => parseFloat(String(v));
+
+const PROGRESS_KEY = 'mh-ai-grading-tutorial-progress';
+function readProgress() {
+  try { return JSON.parse(localStorage.getItem(PROGRESS_KEY) || '{}'); } catch (e) { return {}; }
+}
+function markSectionDone(id) {
+  try {
+    const p = readProgress();
+    p[id] = true;
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(p));
+  } catch (e) {}
+}
+
+class Component extends DCLogic {
+  state = { i: 0, videoEnded: false, playing: false, mode: 'tutorial', zoom: null, fade: false, showComplete: false, marked: false };
+
+  play() {
+    const v = this._video;
+    if (!v) return;
+    v.muted = true;
+    const p = v.play();
+    if (p && p.catch) p.catch(() => {});
+  }
+
+  setVideo = el => {
+    this._video = el;
+    if (!el) return;
+    el.muted = true;
+    if (!this._autoplayed) { this._autoplayed = true; this.play(); }
+  };
+
+  componentDidMount() {
+    try {
+      const v = parseInt(localStorage.getItem('omr-onboarding-step') || '', 10);
+      if (!isNaN(v) && v >= 0 && v < FLAT.length) this.setState({ i: v });
+    } catch (e) {}
+    this.setState({ marked: !!readProgress().t3 });
+    this._key = e => {
+      if (e.key === 'ArrowRight') this.go(this.state.i + 1);
+      if (e.key === 'ArrowLeft') this.go(this.state.i - 1);
+    };
+    window.addEventListener('keydown', this._key);
+  }
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this._key);
+    clearTimeout(this._t);
+  }
+
+  schedule() {
+    clearTimeout(this._t);
+    if (this.state.mode !== 'auto') return;
+    const s = FLAT[this.state.i];
+    const ms = s.kind === 'tablet' ? 18000 : 5600;
+    this._t = setTimeout(() => {
+      const n = this.state.i + 1;
+      this.go(n >= FLAT.length ? 0 : n);
+    }, ms);
+  }
+
+  go(n) {
+    const i = Math.max(0, Math.min(FLAT.length - 1, n));
+    this._autoplayed = false;
+    clearTimeout(this._fadeT);
+    this.setState({ i, videoEnded: false, playing: false, zoom: null, fade: true }, () => this.schedule());
+    this._fadeT = setTimeout(() => this.setState({ fade: false }), 30);
+    try { localStorage.setItem('omr-onboarding-step', String(i)); } catch (e) {}
+  }
+
+  goChapter(ci) {
+    const n = FLAT.findIndex(s => s.ci === ci);
+    if (n >= 0) this.go(n);
+  }
+
+  markComplete() {
+    markSectionDone('t3');
+    this.setState({ marked: true });
+  }
+
+  setMode(mode) { this.setState({ mode }, () => this.schedule()); }
+
+  replay() {
+    const v = this._video;
+    if (v) v.currentTime = 0;
+    this.setState({ videoEnded: false }, () => this.play());
+  }
+
+  renderVals() {
+    const i = this.state.i, s = FLAT[i], kind = s.kind || 'single';
+    const size = s.size || [2881, 1532];
+    const auto = this.state.mode === 'auto';
+    const tip = s.tip || {};
+    const marks = s.marks || [];
+    const done = kind === 'tablet' && this.state.videoEnded;
+    return {
+      chapterName: s.chapter,
+      subLabel: (s.si + 1) + ' / ' + s.subTotal,
+      counter: (i + 1) + ' / ' + FLAT.length,
+      pct: Math.round(((s.si + 1) / s.subTotal) * 100) + '%',
+      stepName: done ? s.doneName : s.name,
+      tag: s.tag,
+      tagNote: s.note,
+      body: done ? s.doneBody : s.body,
+      hint: s.hint || '',
+      hasHint: !!s.hint,
+      hasPapers: !!s.papers,
+      fadeOpacity: this.state.fade ? 0 : 1,
+      fadeShift: this.state.fade ? 'translateY(8px)' : 'none',
+      zoomOpen: !!this.state.zoom,
+      zoomBg: this.state.zoom === 'omr' ? "url('uploads/t3/image 48.png')" : "url('uploads/t3/image 46.png')",
+      zoomRatio: this.state.zoom === 'omr' ? '904 / 1278' : '958 / 1355',
+      zoomPaper: e => { e.stopPropagation(); this.setState({ zoom: 'paper' }); },
+      zoomOmr: e => { e.stopPropagation(); this.setState({ zoom: 'omr' }); },
+      closeZoom: e => { e.stopPropagation(); this.setState({ zoom: null }); },
+      hasChev: !!s.chev,
+      chevTop: s.chev ? s.chev[0] : '0%',
+      chevLeft: s.chev ? s.chev[1] : '0%',
+      isSingle: kind === 'single',
+      isTablet: kind === 'tablet',
+      tipOutside: !!s.outsideTip,
+      tipInside: !s.outsideTip,
+      ratio: size[0] + ' / ' + size[1],
+      imgBg: s.img ? 'url("' + IMG(s.img) + '")' : 'none',
+      imgShift: s.shift ? (-s.shift) + 'px' : '0px',
+      hasMask: !!s.mask,
+      maskFill: typeof s.mask === 'string' ? s.mask : '#fff',
+      spot: !!s.spot,
+      marks: marks.map(m => ({ top: m[0], left: m[1], w: m[2], h: m[3] })),
+      windows: s.spot ? (s.windows || marks).map(m => {
+        const t = num(m[0]), l = num(m[1]), w = num(m[2]), h = num(m[3]);
+        return {
+          top: t + '%', left: l + '%', w: w + '%', h: h + '%',
+          iw: (100 / w * 100).toFixed(2) + '%',
+          ih: (100 / h * 100).toFixed(2) + '%',
+          il: (-l / w * 100).toFixed(2) + '%',
+          it: (-t / h * 100).toFixed(2) + '%'
+        };
+      }) : [],
+      tipTop: tip.top || 'auto',
+      tipBottom: tip.bottom || 'auto',
+      tipLeft: tip.left || 'auto',
+      tipRight: tip.right || 'auto',
+      tipWidth: tip.width || 'min(340px, 40%)',
+      stop: e => e.stopPropagation(),
+      tabletBg: 'url("' + encodeURI(done ? 'uploads/t3/omr스캔-2-6dda2a42.png' : 'uploads/t3/omr스캔-1-c9e4ce95.png') + '")',
+      tabletTitle: done ? s.doneName : s.name,
+      tabletBody: done ? s.doneBody : s.body,
+      videoSrc: encodeURI('uploads/t3/2026-09-06_OMR답안(2).mp4'),
+      videoLive: !this.state.videoEnded,
+      videoRef: this.setVideo,
+      onVideoEnd: () => this.setState({ videoEnded: true, playing: false }),
+      onVideoPlay: () => this.setState({ playing: true }),
+      showPlay: !this.state.playing && !this.state.videoEnded,
+      playVideo: () => this.play(),
+      togglePlay: () => {
+        const v = this._video;
+        if (!v) return;
+        if (v.paused) this.play(); else { v.pause(); this.setState({ playing: false }); }
+      },
+      videoEnded: this.state.videoEnded,
+      replay: () => this.replay(),
+      atStart: i === 0,
+      atEnd: i === FLAT.length - 1,
+      nextLabel: i === FLAT.length - 1 ? '완료' : (s.nextLabel || '다음으로'),
+      nextProps: { style: { background: ACCENT_LINE, border: '1px solid ' + ACCENT_LINE, color: '#fff', fontWeight: 600 } },
+      prev: () => this.go(i - 1),
+      next: () => (i === FLAT.length - 1 ? this.setState({ showComplete: true }) : this.go(i + 1)),
+      showComplete: this.state.showComplete,
+      closeComplete: () => this.setState({ showComplete: false }),
+      markComplete: () => this.markComplete(),
+      markCompleteLabel: this.state.marked ? '완료 처리됨 ✓' : '이 섹션 완료 표시',
+      markCompleteBg: this.state.marked ? '#EFEEFE' : '#fff',
+      goHome: () => { location.href = 'index.html'; },
+      setTutorial: () => this.setMode('tutorial'),
+      setAuto: () => this.setMode('auto'),
+      tutFont: !auto ? '600 13px/1 var(--mh-font)' : '400 13px/1 var(--mh-font)',
+      tutBg: !auto ? ACCENT_LINE : '#fff',
+      tutFg: !auto ? '#fff' : '#777',
+      autoFont: auto ? '600 13px/1 var(--mh-font)' : '400 13px/1 var(--mh-font)',
+      autoBg: auto ? ACCENT_LINE : '#fff',
+      autoFg: auto ? '#fff' : '#777',
+      tabs: CHAPTERS.map((c, ci) => ({
+        no: ci + 1,
+        name: c.name,
+        font: ci === s.ci ? '600 14px/1 var(--mh-font)' : '400 14px/1 var(--mh-font)',
+        bg: ci === s.ci ? ACCENT_TINT : '#fff',
+        fg: ci === s.ci ? ACCENT_TEXT : '#555',
+        border: ci === s.ci ? ACCENT_LINE : '#D9D9D9',
+        numBg: ci === s.ci ? ACCENT_LINE : '#EEEEEE',
+        numFg: ci === s.ci ? '#fff' : '#777',
+        go: () => this.goChapter(ci)
+      })),
+      dots: CHAPTERS[s.ci].steps.map((st, n) => ({
+        name: st.name,
+        w: n === s.si ? '28px' : '10px',
+        bg: n === s.si ? ACCENT_LINE : '#D9D9D9',
+        go: () => this.go(i - s.si + n)
+      }))
+    };
+  }
+}
+
+</script>
+</body>
+</html>
