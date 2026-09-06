@@ -40,9 +40,9 @@
     </a>
     <nav class="mh-nav-links">
       <a class="mh-nav-link" href="index.html">홈</a>
-      <a class="mh-nav-link active" href="tutorial-1.html">Ⅰ. 학습지 출제</a>
-      <a class="mh-nav-link" href="tutorial-2.html">Ⅱ. OMR답안지 출력</a>
-      <a class="mh-nav-link" href="tutorial-3.html">Ⅲ. AI 채점 확인</a>
+      <a class="mh-nav-link active" href="tutorial-1.html">학습지 출제</a>
+      <a class="mh-nav-link" href="tutorial-2.html">OMR답안지 출력</a>
+      <a class="mh-nav-link" href="tutorial-3.html">AI서술형첨삭 확인</a>
     </nav>
   </div>
 </div>
@@ -197,7 +197,7 @@ const STEPS = [
     tip: { x: 50.3, y: 54.2, arrow: 'up' } },
   { img: 9, pill: '안내 문구', title: '학습지에 안내 문구 표시',
     desc: '좌측 미리보기에 [다음부터는 서술형 문제입니다. 각 문제의 풀이 과정을 쓰고 답을 구하세요.] 안내가 추가됩니다.',
-    rects: [{ x: 26.6, y: 30.1, w: 21.0, h: 5.8 }, { x: 59.1, y: 55.4, w: 4.9, h: 3.4 }],
+    rects: [{ x: 26.6, y: 30.1, w: 21.0, h: 5.8, pad: 15 }, { x: 59.1, y: 55.4, w: 4.9, h: 3.4 }],
     tip: { x: 48.8, y: 30.0, arrow: 'left' } },
   { img: 10, pill: '생성 완료', title: '학습지 생성 완료',
     desc: '학습지 생성이 완료되어 학습할 학생을 추가 후 문제지와 OMR 답안지를 출력합니다.',
@@ -346,10 +346,17 @@ class Component extends DCLogic {
         transition: 'opacity .18s ease-out'
       },
       dimStyle: { fill: '#14122B', fillOpacity: dim },
-      holes: s.rects.map(r => ({ x: r.x + '%', y: r.y + '%', w: r.w + '%', h: r.h + '%' })),
+      holes: s.rects.map(r => (r.pad ? {
+        x: 'calc(' + r.x + '% - ' + r.pad + 'px)', y: 'calc(' + r.y + '% - ' + r.pad + 'px)',
+        w: 'calc(' + r.w + '% + ' + (r.pad * 2) + 'px)', h: 'calc(' + r.h + '% + ' + (r.pad * 2) + 'px)'
+      } : { x: r.x + '%', y: r.y + '%', w: r.w + '%', h: r.h + '%' })),
       rings: s.rects.map(r => ({
         style: {
-          position: 'absolute', left: r.x + '%', top: r.y + '%', width: r.w + '%', height: r.h + '%',
+          position: 'absolute',
+          left: r.pad ? 'calc(' + r.x + '% - ' + r.pad + 'px)' : r.x + '%',
+          top: r.pad ? 'calc(' + r.y + '% - ' + r.pad + 'px)' : r.y + '%',
+          width: r.pad ? 'calc(' + r.w + '% + ' + (r.pad * 2) + 'px)' : r.w + '%',
+          height: r.pad ? 'calc(' + r.h + '% + ' + (r.pad * 2) + 'px)' : r.h + '%',
           border: '3px solid #6155F5', borderRadius: '9px', boxSizing: 'border-box',
           cursor: 'pointer', zIndex: 2,
           animation: pulse ? 'mhPulse 1.8s ease-in-out infinite' : 'none',
