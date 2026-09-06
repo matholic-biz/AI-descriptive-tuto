@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="_ds/matholic-design-system-e6d31222-91d3-47b9-aebe-84a65a8b8cf0/styles.css">
 <script src="_ds/matholic-design-system-e6d31222-91d3-47b9-aebe-84a65a8b8cf0/_ds_bundle.js"></script>
 <style>
-  body { margin: 0; background: #F7F8F9; font-family: "SUIT Variable", SUIT, sans-serif; }
+  body { margin: 0; background: #E9E8FA; font-family: "SUIT Variable", SUIT, sans-serif; -webkit-font-smoothing: antialiased; }
   a { color: #6155F5; text-decoration: none; }
   a:hover { text-decoration: underline; }
   .mh-nav{position:sticky; top:0; z-index:40; background:#FFFFFF; border-bottom:1px solid #EEEEEE;}
@@ -42,73 +42,89 @@
     </nav>
   </div>
 </div>
-<div style="min-height: 100vh; padding: 28px 28px 40px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px; align-items: center;">
+<div style="min-height: 100vh; padding: 28px 20px 40px; box-sizing: border-box; display: flex; justify-content: center; align-items: flex-start;">
+  <div style="width: 100%; max-width: 1200px; background: #FFFFFF; border-radius: 16px; border: 1px solid #DDDBF6; box-shadow: 0 12px 40px rgba(30,24,90,0.14); overflow: hidden;">
 
-  <div style="width: 100%; max-width: 1440px; display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
-    <div style="display: flex; flex-direction: column; gap: 6px;">
-      <div style="font-size: 13px; font-weight: 600; color: #6155F5; letter-spacing: -0.005em;">온보딩 가이드</div>
-      <h1 style="margin: 0; font-size: 24px; font-weight: 700; color: #212121; letter-spacing: -0.005em;">OMR답안지 출력</h1>
-      <p style="margin: 0; font-size: 14px; line-height: 22px; color: #555;">시험대비 실전감각을 키우기 위해 OMR답안지로 학습을 진행합니다.</p>
-    </div>
-    <div style="display: flex; align-items: center; gap: 12px;">
-      <span style="font-size: 13px; color: #777; white-space: nowrap;">{{ counter }}</span>
-      <div style="display: flex; gap: 12px;">
-        <button type="button" onClick="{{ prev }}" disabled="{{ atStart }}" style="height: 32px; padding: 0 14px; border-radius: 6px; border: 1px solid #D9D9D9; background: #fff; color: #555; font-family: inherit; font-size: 14px; font-weight: 500; white-space: nowrap; cursor: pointer; transition: all 150ms ease-out;" style-hover="border-color: #6155F5; color: #6155F5;">뒤로</button>
-        <button type="button" onClick="{{ next }}" style="height: 32px; padding: 0 16px; border-radius: 6px; border: 1px solid #6155F5; background: #6155F5; color: #fff; font-family: inherit; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: all 150ms ease-out;" style-hover="background: #4A3EE0; border-color: #4A3EE0;">{{ nextLabel }}</button>
+    <div style="display: flex; align-items: flex-start; gap: 20px; padding: 24px 28px 18px; border-bottom: 1px solid #EEEEEE; flex-wrap: wrap;">
+      <div style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 6px; background: #6155F5; color: #FFFFFF; font-size: 12px; font-weight: 700; letter-spacing: -0.005em;">NEW</span>
+          <span style="font-size: 13px; font-weight: 600; color: #6155F5; letter-spacing: -0.005em; white-space: nowrap;">AI 서술형 첨삭</span>
+        </div>
+        <h1 style="margin: 0; font-size: 24px; font-weight: 700; color: #212121; letter-spacing: -0.01em;">Ⅱ. OMR답안지 출력</h1>
+        <p style="margin: 0; font-size: 14px; line-height: 22px; color: #555555; text-wrap: pretty;">시험대비 실전감각을 키우기 위해 OMR답안지로 학습을 진행합니다.</p>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; flex: 0 0 auto;">
+        <span style="font-size: 13px; font-weight: 600; color: #777777; white-space: nowrap;">{{ counter }}</span>
       </div>
     </div>
-  </div>
 
-  <div style="width: 100%; max-width: 1440px; display: flex; gap: 12px; flex-wrap: wrap;">
-    <sc-for list="{{ steps }}" as="s" hint-placeholder-count="3">
-      <button type="button" onClick="{{ s.go }}" style="{{ s.chipStyle }}">
-        <span style="{{ s.noStyle }}">{{ s.no }}</span>
-        <span style="font-size: 14px; font-weight: 500; color: #212121; text-align: left; letter-spacing: -0.005em;">{{ s.short }}</span>
-      </button>
-    </sc-for>
-  </div>
+    <div style="height: 4px; background: #F0EFFC;">
+      <div style="height: 100%; background: #6155F5; border-radius: 0 4px 4px 0; transition: width .25s ease-out;" style="{{ progressStyle }}"></div>
+    </div>
 
-  <div style="width: 100%; max-width: 1440px; position: relative; aspect-ratio: 2881 / 1532; border: 1px solid #D9D9D9; border-radius: 10px; overflow: hidden; background: #fff;">
-    <img src="uploads/t2/image%2021.png" alt="문제지 출력 화면" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 320ms ease-out; opacity: {{ op0 }};">
-    <img src="uploads/t2/image%2022.png" alt="답안 조절바 드래그 화면" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 320ms ease-out; opacity: {{ op1 }};">
-    <img src="uploads/t2/image%2023.png" alt="OMR 답안지 화면" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 320ms ease-out; opacity: {{ op2 }};">
-    <img src="uploads/t2/pasted-1788576872170-0.png" alt="OMR 답안지 초기화면" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 320ms ease-out; opacity: {{ op3 }};">
-
-    <div style="{{ overlayStyle }}">
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%;">
-        <defs>
-          <mask id="omrSpot" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse" x="0" y="0" width="100" height="100">
-            <rect x="0" y="0" width="100" height="100" fill="#fff"></rect>
-            <sc-for list="{{ holes }}" as="h" hint-placeholder-count="0">
-              <rect x="{{ h.x }}" y="{{ h.y }}" width="{{ h.w }}" height="{{ h.h }}" fill="#000"></rect>
-            </sc-for>
-          </mask>
-        </defs>
-        <rect x="0" y="0" width="100" height="100" fill="{{ dimFill }}" mask="url(#omrSpot)"></rect>
-      </svg>
-
-      <sc-for list="{{ rings }}" as="r" hint-placeholder-count="0">
-        <div style="{{ r.style }}"></div>
+    <div style="display: flex; gap: 8px; padding: 14px 28px; overflow-x: auto; border-bottom: 1px solid #EEEEEE;">
+      <sc-for list="{{ pills }}" as="p" hint-placeholder-count="5">
+        <button type="button" onClick="{{ p.onClick }}" style="{{ p.style }}">{{ p.label }}</button>
       </sc-for>
+    </div>
 
-      <div style="{{ cardStyle }}">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span style="display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; padding: 0 7px; border-radius: 6px; background: #EFEEFE; color: #6155F5; font-size: 12px; font-weight: 700;">{{ badge }}</span>
-          <span style="font-size: 12px; font-weight: 500; color: #999; white-space: nowrap;">OMR답안지 출력</span>
-        </div>
-        <div style="font-size: 16px; font-weight: 700; color: #212121; line-height: 24px; letter-spacing: -0.005em; text-wrap: pretty;">{{ title }}</div>
-        <div style="font-size: 14px; line-height: 22px; color: #555; text-wrap: pretty;">{{ desc }}</div>
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 4px;">
-          <div style="display: flex; gap: 6px; align-items: center;">
-            <sc-for list="{{ dots }}" as="d" hint-placeholder-count="4">
-              <button type="button" onClick="{{ d.go }}" aria-label="{{ d.label }}" style="{{ d.style }}"></button>
-            </sc-for>
+    <div style="padding: 22px 28px 8px;">
+      <div style="position: relative; aspect-ratio: 2881 / 1532; border: 1px solid #D9D9D9; border-radius: 10px; overflow: hidden; background: #fff;">
+        <img src="uploads/t2/image%2021.png" alt="문제지 출력 화면" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 320ms ease-out; opacity: {{ op0 }};">
+        <img src="uploads/t2/image%2022.png" alt="답안 조절바 드래그 화면" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 320ms ease-out; opacity: {{ op1 }};">
+        <img src="uploads/t2/image%2023.png" alt="OMR 답안지 화면" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 320ms ease-out; opacity: {{ op2 }};">
+        <img src="uploads/t2/pasted-1788576872170-0.png" alt="OMR 답안지 초기화면" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 320ms ease-out; opacity: {{ op3 }};">
+
+        <div style="{{ overlayStyle }}">
+          <svg viewBox="0 0 100 100" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%;">
+            <defs>
+              <mask id="omrSpot" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse" x="0" y="0" width="100" height="100">
+                <rect x="0" y="0" width="100" height="100" fill="#fff"></rect>
+                <sc-for list="{{ holes }}" as="h" hint-placeholder-count="0">
+                  <rect x="{{ h.x }}" y="{{ h.y }}" width="{{ h.w }}" height="{{ h.h }}" fill="#000"></rect>
+                </sc-for>
+              </mask>
+            </defs>
+            <rect x="0" y="0" width="100" height="100" fill="{{ dimFill }}" mask="url(#omrSpot)"></rect>
+          </svg>
+
+          <sc-for list="{{ rings }}" as="r" hint-placeholder-count="0">
+            <div style="{{ r.style }}"></div>
+          </sc-for>
+
+          <div style="{{ cardStyle }}">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; padding: 0 7px; border-radius: 6px; background: #EFEEFE; color: #6155F5; font-size: 12px; font-weight: 700;">{{ badge }}</span>
+              <span style="font-size: 12px; font-weight: 500; color: #999; white-space: nowrap;">OMR답안지 출력</span>
+            </div>
+            <div style="font-size: 16px; font-weight: 700; color: #212121; line-height: 24px; letter-spacing: -0.005em; text-wrap: pretty;">{{ title }}</div>
+            <div style="font-size: 14px; line-height: 22px; color: #555; text-wrap: pretty;">{{ desc }}</div>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 4px;">
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <sc-for list="{{ dots }}" as="d" hint-placeholder-count="4">
+                  <button type="button" onClick="{{ d.go }}" aria-label="{{ d.label }}" style="{{ d.style }}"></button>
+                </sc-for>
+              </div>
+              <div style="display: flex; gap: 12px;">
+                <button type="button" onClick="{{ prev }}" disabled="{{ atStart }}" style="height: 32px; padding: 0 12px; border-radius: 6px; border: 1px solid #D9D9D9; background: #fff; color: #555; font-family: inherit; font-size: 14px; font-weight: 500; white-space: nowrap; cursor: pointer; transition: all 150ms ease-out;" style-hover="border-color: #6155F5; color: #6155F5;">뒤로</button>
+                <button type="button" onClick="{{ next }}" style="height: 32px; padding: 0 14px; border-radius: 6px; border: 1px solid #6155F5; background: #6155F5; color: #fff; font-family: inherit; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: all 150ms ease-out;" style-hover="background: #4A3EE0; border-color: #4A3EE0;">{{ nextLabel }}</button>
+              </div>
+            </div>
           </div>
-          <div style="display: flex; gap: 12px;">
-            <button type="button" onClick="{{ prev }}" disabled="{{ atStart }}" style="height: 32px; padding: 0 12px; border-radius: 6px; border: 1px solid #D9D9D9; background: #fff; color: #555; font-family: inherit; font-size: 14px; font-weight: 500; white-space: nowrap; cursor: pointer; transition: all 150ms ease-out;" style-hover="border-color: #6155F5; color: #6155F5;">뒤로</button>
-            <button type="button" onClick="{{ next }}" style="height: 32px; padding: 0 14px; border-radius: 6px; border: 1px solid #6155F5; background: #6155F5; color: #fff; font-family: inherit; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: all 150ms ease-out;" style-hover="background: #4A3EE0; border-color: #4A3EE0;">{{ nextLabel }}</button>
-          </div>
         </div>
+      </div>
+    </div>
+
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 28px 24px; flex-wrap: wrap;">
+      <div style="display: flex; flex-direction: column; gap: 4px; min-width: 0;">
+        <span style="font-size: 13px; font-weight: 600; color: #6155F5;">표시된 곳을 눌러 다음 단계로 이동합니다.</span>
+        <span style="font-size: 12px; color: #999999;">키보드 좌·우 방향키로도 이동할 수 있습니다.</span>
+      </div>
+      <div style="display: flex; gap: 12px; flex: 0 0 auto;">
+        <button type="button" onClick="{{ restart }}" style="{{ ghostStyle }}">처음부터</button>
+        <button type="button" onClick="{{ prev }}" disabled="{{ atStart }}" style="{{ prevStyle }}">← 이전</button>
+        <button type="button" onClick="{{ next }}" style="{{ nextStyle }}">{{ nextLabel }}</button>
       </div>
     </div>
   </div>
@@ -337,6 +353,28 @@ class Component extends DCLogic {
       };
     });
 
+    const btn = (kind, disabled) => ({
+      height: "40px", padding: "0 20px", borderRadius: "6px", fontFamily: "inherit",
+      fontSize: "14px", fontWeight: 600, letterSpacing: "-0.005em", whiteSpace: "nowrap",
+      cursor: disabled ? "default" : "pointer", transition: "all .15s ease-out",
+      border: kind === "primary" ? "1px solid " + accent : "1px solid #D9D9D9",
+      background: disabled ? "#F7F8F9" : (kind === "primary" ? accent : "#FFFFFF"),
+      color: disabled ? "#999999" : (kind === "primary" ? "#FFFFFF" : "#555555")
+    });
+
+    const pills = STEPS.map((st, n) => ({
+      label: (n + 1) + ". " + st.short,
+      onClick: () => this.go(n),
+      style: {
+        flex: "0 0 auto", height: "30px", padding: "0 12px", borderRadius: "999px", whiteSpace: "nowrap",
+        fontFamily: "inherit", fontSize: "13px", fontWeight: n === i ? 700 : 500,
+        cursor: "pointer", transition: "all .15s ease-out",
+        border: n === i ? "1px solid " + accent : "1px solid #E3E1F7",
+        background: n === i ? "#EFEEFE" : "#FFFFFF",
+        color: n === i ? accent : (n < i ? "#555555" : "#999999")
+      }
+    }));
+
     return {
       op0: op(0), op1: op(1), op2: op(2), op3: op(3),
       overlayStyle,
@@ -352,8 +390,14 @@ class Component extends DCLogic {
       atStart: i === 0,
       next: () => (i === STEPS.length - 1 ? this.setState({ showComplete: true }) : this.go(i + 1)),
       prev: () => this.go(i - 1),
+      restart: () => this.go(0),
       dots,
       steps: chips,
+      pills,
+      progressStyle: { width: ((i + 1) / STEPS.length * 100).toFixed(1) + "%" },
+      prevStyle: btn("sub", i === 0),
+      nextStyle: btn("primary", false),
+      ghostStyle: btn("sub", false),
       showComplete: this.state.showComplete,
       closeComplete: () => this.setState({ showComplete: false }),
       markComplete: () => this.markComplete(),
