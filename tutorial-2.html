@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="_ds/matholic-design-system-e6d31222-91d3-47b9-aebe-84a65a8b8cf0/styles.css">
 <script src="_ds/matholic-design-system-e6d31222-91d3-47b9-aebe-84a65a8b8cf0/_ds_bundle.js"></script>
 <style>
+  html { scrollbar-gutter: stable; }
   body { margin: 0; background: #E9E8FA; font-family: "SUIT Variable", SUIT, sans-serif; -webkit-font-smoothing: antialiased; }
   a { color: #6155F5; text-decoration: none; }
   a:hover { text-decoration: underline; }
@@ -130,7 +131,9 @@
                 </sc-for>
               </div>
               <div style="display: flex; gap: 12px;">
-                <button type="button" onClick="{{ prev }}" disabled="{{ atStart }}" style="height: 32px; padding: 0 12px; border-radius: 6px; border: 1px solid #D9D9D9; background: #fff; color: #555; font-family: inherit; font-size: 14px; font-weight: 500; white-space: nowrap; cursor: pointer; transition: all 150ms ease-out;" style-hover="border-color: #6155F5; color: #6155F5;">뒤로</button>
+                <sc-if value="{{ showBack }}" hint-placeholder-val="{{ true }}">
+              <button type="button" onClick="{{ prev }}" style="height: 32px; padding: 0 12px; border-radius: 6px; border: 1px solid #D9D9D9; background: #fff; color: #555; font-family: inherit; font-size: 14px; font-weight: 500; white-space: nowrap; cursor: pointer; transition: all 150ms ease-out;" style-hover="border-color: #6155F5; color: #6155F5;">뒤로</button>
+            </sc-if>
                 <button type="button" onClick="{{ next }}" style="height: 32px; padding: 0 14px; border-radius: 6px; border: 1px solid #6155F5; background: #6155F5; color: #fff; font-family: inherit; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: all 150ms ease-out;" style-hover="background: #4A3EE0; border-color: #4A3EE0;">{{ nextLabel }}</button>
               </div>
             </div>
@@ -215,9 +218,9 @@ const STEPS = [
     title: "[문제지 출력] → [OMR답안지] 버튼 선택",
     desc: "문제지 출력 화면에서 OMR답안지만 선택합니다.",
     holes: [
-      { x: 1.4, y: 6.2, w: 5.4, h: 5.4 },
+      { x: 1.4, y: 6.0, w: 5.6, h: 5.6 },
       // [답안 작성 용지] · [OMR 답안지] 두 줄만 감싸고 [문항 힌트]는 제외 (여백 4px)
-      { x: 85.3, y: 48.0, w: 13.3, h: 4.3, pad: 4 }
+      { x: 85.63, y: 55.36, w: 13.67, h: 4.10, pad: 4 }
     ],
     card: { left: 60, top: 60 }
   },
@@ -225,14 +228,14 @@ const STEPS = [
     shot: 3, badge: "2", short: "OMR답안지 초기화면 확인",
     title: "[OMR답안지] 선택 직후 초기화면",
     desc: "OMR답안지를 선택하면 객관식 답안 영역이 먼저 생성됩니다.",
-    holes: [{ x: 31.3, y: 29.4, w: 11.0, h: 22.5 }],
+    holes: [{ x: 30.65, y: 31.66, w: 10.55, h: 23.04 }],
     card: { left: 47, top: 30 }
   },
   {
     shot: 1, badge: "3", short: "[답안 조절바] 드래그",
     title: "[답안 조절바]로 영역 조정",
     desc: "조절바를 위아래로 드래그하여 서술형 답안 영역을 설정할 수 있습니다.",
-    holes: [{ x: 31.5, y: 95.2, w: 40.8, h: 3.6 }],
+    holes: [{ x: 33.2, y: 91.5, w: 38.5, h: 3.2 }],
     card: { left: 33, top: 56 }
   },
   {
@@ -240,9 +243,9 @@ const STEPS = [
     title: "[답안입력창] 확인 후 [출력하기]",
     desc: "답안 영역 조정이 완료되었다면 출력하여 학생의 학습을 시작합니다.",
     holes: [
-      { x: 32.3, y: 28.4, w: 10.0, h: 20.5 },
-      { x: 32.3, y: 55.8, w: 41.0, h: 44.2 },
-      { x: 82.3, y: 6.3, w: 11.0, h: 4.4 }
+      { x: 30.65, y: 29.9, w: 10.55, h: 23.04 },
+      { x: 30.65, y: 58.13, w: 43.42, h: 41.87 },
+      { x: 81.7, y: 7.6, w: 11.4, h: 3.6 }
     ],
     card: { left: 47, top: 20 }
   }
@@ -285,7 +288,10 @@ class Component extends DCLogic {
     this._timers = [];
     this._raf = requestAnimationFrame(() => this.setState({ visible: true }));
     this._key = (e) => {
-      if (e.key === "ArrowRight") this.go(this.state.step + 1);
+      if (e.key === "ArrowRight") {
+        if (this.state.step >= STEPS.length - 1) this.setState({ showComplete: true });
+        else this.go(this.state.step + 1);
+      }
       if (e.key === "ArrowLeft") this.go(this.state.step - 1);
     };
     window.addEventListener("keydown", this._key);
@@ -471,6 +477,7 @@ class Component extends DCLogic {
       counter: i === 0 ? "시작 안내" : i + " / " + (STEPS.length - 1),
       nextLabel: i === STEPS.length - 1 ? "완료" : (i === 0 ? "시작하기" : "다음으로"),
       atStart: i === 0,
+      showBack: i > 0,
       next: () => (i === STEPS.length - 1 ? this.setState({ showComplete: true }) : this.go(i + 1)),
       prev: () => this.go(i - 1),
       restart: () => this.go(0),
