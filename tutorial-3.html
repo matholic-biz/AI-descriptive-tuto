@@ -116,14 +116,9 @@
       <sc-if value="{{ hasPapers }}" hint-placeholder-val="{{ false }}">
         <div style="display:flex; flex-wrap:wrap; gap:28px">
           <div style="display:flex; flex-direction:column; gap:8px; flex:none">
-            <div style="font:400 13px/20px var(--mh-font); color:#555">출력했던 답안용지를 스캔합니다.</div>
-            <div style="width:190px; height:23px; background-image:url('uploads/t3/image 52.png'); background-size:190px auto; background-position:0 0; background-repeat:no-repeat"></div>
-            <div style="width:210px; aspect-ratio:958 / 1355; border:1px solid #EEEEEE; border-radius:4px; background-image:url('uploads/t3/image 46.png'); background-size:100% 100%; background-repeat:no-repeat; background-color:#fff"></div>
-          </div>
-          <div style="display:flex; flex-direction:column; gap:8px; flex:none">
             <div style="font:400 13px/20px var(--mh-font); color:#555">출력했던 OMR답안을 스캔합니다.</div>
             <div style="width:190px; height:23px; background-image:url('uploads/t3/image 52.png'); background-size:190px auto; background-position:0 100%; background-repeat:no-repeat"></div>
-            <div style="width:210px; aspect-ratio:904 / 1278; border:1px solid #EEEEEE; border-radius:4px; background-image:url('uploads/t3/image 48.png'); background-size:100% 100%; background-repeat:no-repeat; background-color:#fff"></div>
+            <div style="width:210px; aspect-ratio:1980 / 1400; border:1px solid #EEEEEE; border-radius:4px; background-image:url('uploads/t3/omr-sheet-v2.png'); background-size:100% 100%; background-repeat:no-repeat; background-color:#fff"></div>
           </div>
         </div>
       </sc-if>
@@ -192,18 +187,9 @@
           <sc-if value="{{ hasPapers }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex; flex-wrap:wrap; gap:20px; padding:12px 14px; background:#fff; border:1px solid #D9D9D9; border-radius:10px; box-shadow:0 6px 16px rgba(0,35,11,0.2)">
               <div style="display:flex; flex-direction:column; gap:6px; flex:none">
-                <div style="font:400 12px/18px var(--mh-font); color:#555">출력했던 답안용지를 스캔합니다.</div>
-                <div style="width:150px; height:19px; background-image:url('uploads/t3/image 52.png'); background-size:150px auto; background-position:0 0; background-repeat:no-repeat"></div>
-                <button type="button" onClick="{{ zoomPaper }}" title="크게 보기" style="position:relative; padding:0; width:56px; aspect-ratio:958 / 1355; border:1px solid #EEEEEE; border-radius:4px; cursor:zoom-in; background-image:url('uploads/t3/image 46.png'); background-size:100% 100%; background-repeat:no-repeat; background-color:#fff">
-                  <span style="position:absolute; right:-8px; bottom:-8px; display:flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:999px; background:#4A3EE0; color:#fff; box-shadow:0 2px 6px rgba(0,0,0,0.2)">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path><path d="M11 8v6"></path><path d="M8 11h6"></path></svg>
-                  </span>
-                </button>
-              </div>
-              <div style="display:flex; flex-direction:column; gap:6px; flex:none">
                 <div style="font:400 12px/18px var(--mh-font); color:#555">출력했던 OMR답안을 스캔합니다.</div>
                 <div style="width:150px; height:19px; background-image:url('uploads/t3/image 52.png'); background-size:150px auto; background-position:0 100%; background-repeat:no-repeat"></div>
-                <button type="button" onClick="{{ zoomOmr }}" title="크게 보기" style="position:relative; padding:0; width:56px; aspect-ratio:904 / 1278; border:1px solid #EEEEEE; border-radius:4px; cursor:zoom-in; background-image:url('uploads/t3/image 48.png'); background-size:100% 100%; background-repeat:no-repeat; background-color:#fff">
+                <button type="button" onClick="{{ zoomOmr }}" title="크게 보기" style="position:relative; padding:0; width:56px; aspect-ratio:1980 / 1400; border:1px solid #EEEEEE; border-radius:4px; cursor:zoom-in; background-image:url('uploads/t3/omr-sheet-v2.png'); background-size:100% 100%; background-repeat:no-repeat; background-color:#fff">
                   <span style="position:absolute; right:-8px; bottom:-8px; display:flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:999px; background:#4A3EE0; color:#fff; box-shadow:0 2px 6px rgba(0,0,0,0.2)">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path><path d="M11 8v6"></path><path d="M8 11h6"></path></svg>
                   </span>
@@ -615,9 +601,8 @@ class Component extends DCLogic {
       fadeOpacity: this.state.fade ? 0 : 1,
       fadeShift: this.state.fade ? 'translateY(8px)' : 'none',
       zoomOpen: !!this.state.zoom,
-      zoomBg: this.state.zoom === 'omr' ? "url('uploads/t3/image 48.png')" : "url('uploads/t3/image 46.png')",
-      zoomRatio: this.state.zoom === 'omr' ? '904 / 1278' : '958 / 1355',
-      zoomPaper: e => { e.stopPropagation(); this.setState({ zoom: 'paper' }); },
+      zoomBg: "url('uploads/t3/omr-sheet-v2.png')",
+      zoomRatio: '1980 / 1400',
       zoomOmr: e => { e.stopPropagation(); this.setState({ zoom: 'omr' }); },
       closeZoom: e => { e.stopPropagation(); this.setState({ zoom: null }); },
       hasChev: !!s.chev,
