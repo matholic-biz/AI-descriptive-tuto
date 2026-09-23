@@ -250,7 +250,7 @@
         <div style="position:absolute; pointer-events:none; border:2px solid #6155F5; border-radius:8px; left:44%; top:20.3%; width:12%; height:6.4%; box-shadow:0 0 0 1px #4A3EE0, 0 0 0 4px rgba(97,85,245,0.30)"></div>
 
         <sc-if value="{{ videoLive }}" hint-placeholder-val="{{ true }}">
-          <div onClick="{{ stop }}" style="position:absolute; right:3%; bottom:5%; width:36%; cursor:default; transform-origin:bottom right; animation:mhDeviceZoom 8s ease-in-out .35s 1 both">
+          <div onClick="{{ stop }}" style="position:absolute; right:3%; bottom:5%; width:36%; cursor:default; transform-origin:bottom right; animation:mhDeviceZoom 7.4s ease-in-out .35s 1 both">
             <div style="margin-bottom:3%; padding:9px 12px; border-radius:10px; background:#4A3EE0; color:#fff; font:600 13px/19px var(--mh-font); text-align:center; box-shadow:0 6px 16px rgba(0,35,11,0.24); text-wrap:pretty">모바일 카메라로 [QR코드]만 스캔하면 손쉽게 파일 업로드 완료!</div>
             <div style="position:relative; padding:1.2%; border-radius:18px; background:#141414; box-shadow:0 10px 24px rgba(0,0,0,0.28)">
               <video src="{{ videoSrc }}" ref="{{ videoRef }}" onEnded="{{ onVideoEnd }}" onPlay="{{ onVideoPlay }}" onClick="{{ togglePlay }}" playsinline style="display:block; width:100%; aspect-ratio:1280 / 720; border-radius:8px; background:#fff; cursor:pointer"></video>
@@ -375,20 +375,11 @@ const CHAPTERS = [
 
     { tag: '1', note: 'OMR답안 입력', name: '답안입력 화면으로 이동',
       body: ['우측 상단의 답안입력 아이콘을 클릭하여 답안입력 화면으로 이동합니다.'],
-      papers: true, nextLabel: '답안용지 스캔하기',
+      papers: true, nextLabel: 'OMR답안 입력하기',
       img: '1', size: [2308, 1329], spot: true,
-      marks: [['1.2%', '91.3%', '5.5%', '11.5%'], ['9.3%', '61.8%', '12.2%', '7.2%'], ['9.3%', '74.6%', '13%', '7.2%']],
+      // 우측 상단 [답안입력] 아이콘과 [OMR 답안 스캔하기] 두 곳만 강조합니다.
+      marks: [['1.2%', '91.3%', '5.5%', '11.5%'], ['9.3%', '74.6%', '13%', '7.2%']],
       tip: { top: '17.5%', left: '52%', width: 'min(520px, 46%)' } },
-
-    { tag: '참고', note: '답안용지 스캔하기', name: '[답안용지 스캔하기] 선택 → AR 답안입력 창',
-      body: ['OMR답안 스캔하기 왼쪽의 [답안용지 스캔하기]를 선택하면 AR 답안입력 창이 열립니다.', '답안 작성 용지의 QR코드와 마커가 모두 보이게 촬영하여 한번에 답안입력합니다.'],
-      hint: '[시작하기]를 선택하면 촬영이 시작됩니다.',
-      nextLabel: 'OMR답안 스캔하기',
-      img: 16, mask: true, spot: true,
-      marks: [['8.5%', '59.8%', '12.5%', '6%']],
-      // AR 답안입력 창(image 17)을 작은 창으로 겹쳐서 표시합니다.
-      inset: { img: 17, sx: 30, sy: 18, sw: 40, sh: 52, left: '12%', top: '30%', width: '30%' },
-      tip: { top: '30%', left: '62%' } },
 
     { tag: '1-1 · 1-2 · 1-3', note: '업로드 방식', name: '업로드 방식 선택',
       body: ['세 가지 방식 중 편한 방식으로 업로드합니다.', '① 파일 업로드 : 기기에 저장된 파일을 드래그 앤 드랍으로 업로드합니다.', '② 모바일 업로드 : 휴대폰 · 태블릿으로 답안 작성 용지를 스캔할 수 있는 페이지로 이동합니다.', '③ 클라우드 업로드 : 연동된 클라우드의 파일을 드래그 앤 드랍으로 업로드합니다.'],
@@ -419,12 +410,6 @@ const CHAPTERS = [
       img: 27, mask: true, spot: true,
       marks: [['26.8%', '9.3%', '77.5%', '67.5%'], ['40.5%', '30.2%', '6%', '5.5%'], ['46%', '13.8%', '13%', '24%']],
       chev: ['70%', '86%'] },
-
-    { tag: '3', note: '서술형 채점', name: '[AI풀이채점] 선택',
-      body: ['학생의 서술형 풀이를 확인하며 [AI풀이채점]을 선택합니다.'],
-      img: 29, mask: true, spot: true,
-      windows: [['26.8%', '9.3%', '77.5%', '67.5%']],
-      marks: [['61%', '53.3%', '8%', '5.5%']] },
 
     { tag: '4', note: 'AI 채점 결과', name: 'AI 풀이 점수 · 단계별 첨삭',
       body: ['AI가 학생의 풀이 과정을 분석하여 풀이 점수를 부여합니다.', 'AI의 단계적인 채점과 첨삭을 통해 선생님의 지도가 쉬워집니다.'],
@@ -677,7 +662,7 @@ class Component extends DCLogic {
       tabletBg: 'url("' + encodeURI(done ? 'uploads/t3/omr스캔-2-6dda2a42.png' : 'uploads/t3/omr스캔-1-c9e4ce95.png') + '")',
       tabletTitle: done ? s.doneName : s.name,
       tabletBody: done ? s.doneBody : s.body,
-      videoSrc: encodeURI('uploads/t3/2026-09-06_OMR답안(2).mp4'),
+      videoSrc: encodeURI('uploads/t3/2026-09-06_OMR답안(2).mp4') + '?v=2',
       videoLive: !this.state.videoEnded,
       videoRef: this.setVideo,
       onVideoEnd: () => this.setState({ videoEnded: true, playing: false }),
